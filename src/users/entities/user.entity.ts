@@ -1,8 +1,9 @@
-import { BeforeInsert, Column, Entity } from 'typeorm';
+import { BeforeInsert, Column, Entity, OneToMany } from 'typeorm';
 import { BaseSchema } from 'src/database/base-schema';
 import { Exclude } from 'class-transformer';
 import { hashSync, compareSync, genSaltSync } from 'bcrypt';
 import { ApiHideProperty, ApiProperty, ApiSchema } from '@nestjs/swagger';
+import { Customer } from '@/customers/entities/customer.entity';
 
 @ApiSchema({
   name: 'UserEntity',
@@ -34,6 +35,11 @@ export class User extends BaseSchema {
   })
   @Column({ nullable: true })
   avatar: string;
+
+  @OneToMany(() => Customer, (customer) => customer.user, {
+    cascade: true,
+  })
+  customers: Customer[];
 
   hashPassword() {
     const salt = genSaltSync(10);

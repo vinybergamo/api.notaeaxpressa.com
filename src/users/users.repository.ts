@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/database/base-repository';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 
 @Injectable()
 export class UsersRepository extends BaseRepository<User> {
@@ -14,10 +14,10 @@ export class UsersRepository extends BaseRepository<User> {
   }
 
   async findByEmail(email: string): Promise<User> {
-    return this.findOne({ email });
+    return this.findOne({ email: ILike(`%${email}%`) });
   }
 
   async findByEmailOrFail(email: string): Promise<User> {
-    return this.findOneOrFail({ email });
+    return this.findOneOrFail({ email: ILike(`%${email}%`) });
   }
 }

@@ -24,7 +24,10 @@ export class AuthService {
     const exists = await this.usersRepository.findByEmail(registerDto.email);
 
     if (exists) {
-      throw new BadRequestException('USER_ALREADY_EXISTS');
+      throw new BadRequestException(
+        'USER_ALREADY_EXISTS',
+        'User already exists',
+      );
     }
 
     const user = await this.usersRepository.create(registerDto);
@@ -39,7 +42,10 @@ export class AuthService {
     const user = await this.usersRepository.findByEmail(loginDto.email);
 
     if (!user) {
-      throw new UnauthorizedException('INVALID_CREDENTIALS');
+      throw new UnauthorizedException(
+        'INVALID_CREDENTIALS',
+        'Invalid credentials',
+      );
     }
 
     const passwordMatches = user.passwordMatch(loginDto.password);
@@ -64,7 +70,7 @@ export class AuthService {
   }
 
   private generateToken(user: User) {
-    const expiresIn = this.configService.get('JWT_EXPIRES_IN');
+    const expiresIn = this.configService.get('JWT_EXPIRES_IN', '1d');
     const payload = { sub: user.id };
     const expiresMs = Number(ms(expiresIn));
     const expiresInSeconds = millisecondsToSeconds(expiresMs);

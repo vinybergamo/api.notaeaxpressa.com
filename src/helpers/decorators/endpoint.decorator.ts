@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { applyDecorators } from '@nestjs/common';
 import { IsPublic } from './is-public.decorator';
-import { ApiExtraModels, ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExtraModels, ApiOperation } from '@nestjs/swagger';
 import { Cache } from './cache.decorator';
 import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { milliseconds } from 'date-fns';
@@ -58,6 +58,10 @@ export function Endpoint(options: EndpointOptions) {
 
   if (isPublic) {
     decorators.push(IsPublic());
+  }
+
+  if (!isPublic && !documentation?.security?.length) {
+    decorators.push(ApiBearerAuth('bearer'));
   }
 
   if (!!documentation) {

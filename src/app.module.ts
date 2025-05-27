@@ -7,6 +7,8 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { milliseconds } from 'date-fns';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { CustomersModule } from './customers/customers.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -32,9 +34,13 @@ import { APP_GUARD } from '@nestjs/core';
         },
       ],
     }),
+    EventEmitterModule.forRoot({
+      global: true,
+    }),
     DatabaseModule,
     UsersModule,
     AuthModule,
+    CustomersModule,
   ],
   providers: [
     {

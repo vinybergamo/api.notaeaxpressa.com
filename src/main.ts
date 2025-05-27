@@ -8,6 +8,7 @@ import {
   VersioningType,
 } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { HttpExceptionFilter } from './helpers/exceptions/http-exception-filter.exception';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -18,6 +19,7 @@ async function bootstrap() {
   const appUrl = config.get<string | undefined>('APP_URL')?.split(/[,;]/);
 
   app.enableCors();
+  app.useGlobalFilters(new HttpExceptionFilter());
   app.setGlobalPrefix('api');
   app.enableVersioning({
     type: VersioningType.URI,
