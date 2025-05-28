@@ -3,6 +3,7 @@ import { BaseSchema } from '../../database/base-schema';
 import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 import { Customer } from '@/customers/entities/customer.entity';
 import { User } from '@/users/entities/user.entity';
+import * as math from 'mathjs';
 
 interface Pix {
   e2eID?: string;
@@ -220,13 +221,13 @@ export class Charge extends BaseSchema {
 
   @BeforeInsert()
   setDefaults() {
-    this.totalAmount = this.amount + this.additionalFee;
-    this.liqAmount = this.totalAmount - (this.fee ?? 0);
+    this.totalAmount = math.add(this.amount, this.additionalFee ?? 0);
+    this.liqAmount = math.subtract(this.totalAmount, this.fee ?? 0);
   }
 
   @BeforeUpdate()
   updateDefaults() {
-    this.totalAmount = this.amount + this.additionalFee;
-    this.liqAmount = this.totalAmount - (this.fee ?? 0);
+    this.totalAmount = math.add(this.amount, this.additionalFee ?? 0);
+    this.liqAmount = math.subtract(this.totalAmount, this.fee ?? 0);
   }
 }

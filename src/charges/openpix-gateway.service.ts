@@ -5,6 +5,7 @@ import { Charge } from './entities/charge.entity';
 import { OpenPixService } from 'openpix-nestjs';
 import { format } from 'date-fns';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import * as math from 'mathjs';
 
 @Injectable()
 export class OpenPixGatewayService implements GatewayFactory {
@@ -17,7 +18,7 @@ export class OpenPixGatewayService implements GatewayFactory {
   async create(charge: Charge): Promise<Charge> {
     const correlationID = format(new Date(), 'yyyyMMddHHmmssSSS');
     const payment = await this.openPixService.charge.create({
-      value: charge.amount,
+      value: math.add(charge.amount, charge.additionalFee ?? 0),
       comment: charge.description,
       correlationID: charge.correlationID || correlationID,
     });
