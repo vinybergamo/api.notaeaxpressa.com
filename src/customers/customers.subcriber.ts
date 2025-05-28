@@ -28,31 +28,31 @@ export class CustomersSubscriber
 
   afterInsert(event: InsertEvent<Customer>) {
     if (event.entity) {
-      this.eventEmitter.emit('customer.create', event.entity);
+      this.eventEmitter.emit('customers.create', event.entity);
     }
   }
 
   afterUpdate(event: UpdateEvent<Customer>): Promise<any> | void {
     if (event.entity) {
-      this.eventEmitter.emit('customer.update', event.entity);
+      this.eventEmitter.emit('customers.update', event.entity);
     }
   }
 
   afterRemove(event: RemoveEvent<Customer>): Promise<any> | void {
     if (event.entity) {
-      this.eventEmitter.emit('customer.delete', event.entity);
+      this.eventEmitter.emit('customers.delete', event.entity);
     }
   }
 
   afterSoftRemove(event: SoftRemoveEvent<Customer>): Promise<any> | void {
     if (event.entity) {
-      this.eventEmitter.emit('customer.delete', event.entity);
+      this.eventEmitter.emit('customers.delete', event.entity);
     }
   }
 
   afterRecover(event: RecoverEvent<Customer>): Promise<any> | void {
     if (event.entity) {
-      this.eventEmitter.emit('customer.recover', event.entity);
+      this.eventEmitter.emit('customers.recover', event.entity);
     }
   }
 }

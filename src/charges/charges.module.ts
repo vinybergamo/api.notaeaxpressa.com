@@ -11,6 +11,7 @@ import { ChargesListener } from './charges.listerner';
 import { Customer } from '@/customers/entities/customer.entity';
 import { CustomersRepository } from '@/customers/customers.repository';
 import { ManualGatewayService } from './manual-gateway.service';
+import { ChargesSubscriber } from './charges.subcriber';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { ManualGatewayService } from './manual-gateway.service';
     ManualGatewayService,
     ChargesListener,
     CustomersRepository,
+    ChargesSubscriber,
   ],
   exports: [ChargesService, ChargesRepository],
 })
