@@ -24,6 +24,10 @@ interface Pix {
 })
 @Entity()
 export class Charge extends BaseSchema {
+  @ApiProperty({})
+  @Column({ default: 1 })
+  index: number;
+
   @ApiProperty({
     description: 'Unique identifier for the charge',
     example: '12345',

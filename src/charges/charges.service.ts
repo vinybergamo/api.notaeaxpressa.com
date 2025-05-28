@@ -28,6 +28,9 @@ export class ChargesService {
     this.validateGateway(createChargeDto.gateway, [
       createChargeDto.paymentMethod,
     ]);
+    const charges = await this.chargesRepository.find({
+      user: { id: user.id },
+    });
     const customer = createChargeDto.customerId
       ? await this.customersRepository.findByIdOrFail(
           createChargeDto.customerId,
@@ -46,7 +49,8 @@ export class ChargesService {
 
     const charge = await this.chargesRepository.create({
       ...createChargeDto,
-      correlationID: `${user.id}:${format(new Date(), 'yyyyMMddHHmmssSSS')}`,
+      index: charges.length + 1,
+      correlationID: `${user.id}${format(new Date(), 'yyyyMMddHHmmssSSS')}`,
       methods: [createChargeDto.paymentMethod],
       customer,
       user: {

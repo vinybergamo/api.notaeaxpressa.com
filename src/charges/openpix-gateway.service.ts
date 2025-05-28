@@ -29,7 +29,7 @@ export class OpenPixGatewayService implements GatewayFactory {
         expiresIn: payment.expiresIn,
         gatewayChargeID: payment.transactionID,
         expiresAt: payment.expiresDate,
-        correlationID,
+        correlationID: charge.correlationID || correlationID,
         fee: payment.fee,
         url: payment.paymentLinkUrl,
         paymentMethod: 'PIX',
@@ -49,6 +49,7 @@ export class OpenPixGatewayService implements GatewayFactory {
     const transaction = await this.openPixService.transaction.get(
       payload.transactionID,
     );
+
     const payment = await this.openPixService.charge.get(payload.identifier);
 
     const charge = await this.chargesRepository.findOne({
