@@ -19,7 +19,7 @@ export class WebhooksController {
           'application/json': {
             schema: {
               type: 'object',
-              additionalProperties: true, // Allows any structure for the webhook body
+              additionalProperties: false,
             },
           },
         },

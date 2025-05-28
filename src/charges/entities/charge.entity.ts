@@ -6,7 +6,6 @@ import { User } from '@/users/entities/user.entity';
 import * as math from 'mathjs';
 
 interface Pix {
-  e2eID?: string;
   method: string;
   txId: string;
   value: number;
@@ -194,7 +193,19 @@ export class Charge extends BaseSchema {
   @ApiProperty({
     description: 'Pix payment details, if applicable',
     type: 'object',
-    additionalProperties: true,
+    additionalProperties: false,
+    example: {
+      method: 'PIX',
+      txId: 'tx_1234567890',
+      value: 1000,
+      status: 'PAID',
+      fee: 10,
+      brCode:
+        '00020101021126640014BR.GOV.BCB.PIX0114e2eID1234567890123456789012345678905204000053039865404100000000000000000000000000006304A0B1',
+      transactionID: 'tx_1234567890',
+      identifier: 'id_1234567890',
+      qrCodeImage: 'https://example.com/qr-code.png',
+    },
   })
   @Column({ type: 'jsonb', nullable: true })
   pix?: Pix;
@@ -202,7 +213,7 @@ export class Charge extends BaseSchema {
   @ApiProperty({
     description: 'Metadata associated with the charge',
     type: 'object',
-    additionalProperties: true,
+    additionalProperties: false,
   })
   @Column({ type: 'jsonb', nullable: true })
   metadata?: Record<string, any>;

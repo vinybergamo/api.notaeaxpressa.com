@@ -11,6 +11,7 @@ import { OpenPixGatewayService } from './openpix-gateway.service';
 import { CustomersRepository } from '@/customers/customers.repository';
 import { format } from 'date-fns';
 import { ManualGatewayService } from './manual-gateway.service';
+import { PaginateQuery } from 'nestjs-paginate';
 
 @Injectable()
 export class ChargesService {
@@ -20,6 +21,18 @@ export class ChargesService {
     private readonly customersRepository: CustomersRepository,
     private readonly manualGatewayService: ManualGatewayService,
   ) {}
+
+  async list(
+    user: UserRequest,
+    paginateQuery: PaginateQuery,
+    relations?: string,
+  ) {
+    return this.chargesRepository.list(
+      user.id,
+      paginateQuery,
+      relations.split(';'),
+    );
+  }
 
   async createOneStep(
     user: UserRequest,
