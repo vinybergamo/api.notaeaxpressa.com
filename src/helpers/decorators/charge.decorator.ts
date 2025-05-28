@@ -3,16 +3,16 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { OnEventOptions } from '@nestjs/event-emitter/dist/interfaces';
 
 export const OnChargePaid = (options?: OnEventOptions) =>
-  applyDecorators(OnEvent('charge.paid', options));
+  applyDecorators(OnEvent('charges.paid', options));
 
 export const OnChargeCompleted = (options?: OnEventOptions) =>
-  applyDecorators(OnEvent('charge.completed', options));
+  applyDecorators(OnEvent('charges.completed', options));
 
 export const OnChargeFailed = (options?: OnEventOptions) =>
-  applyDecorators(OnEvent('charge.failed', options));
+  applyDecorators(OnEvent('charges.failed', options));
 
 export const OnChargeRefunded = (options?: OnEventOptions) =>
-  applyDecorators(OnEvent('charge.refunded', options));
+  applyDecorators(OnEvent('charges.refunded', options));
 
 export const OnChargeDelete = (options?: OnEventOptions) =>
   applyDecorators(OnEvent('charges.delete', options));

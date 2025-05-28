@@ -19,7 +19,7 @@ export class OpenPixGatewayService implements GatewayFactory {
     const correlationID = format(new Date(), 'yyyyMMddHHmmssSSS');
     const payment = await this.openPixService.charge.create({
       value: math.add(charge.amount, charge.additionalFee ?? 0),
-      comment: charge.description,
+      comment: charge.description ?? undefined,
       correlationID: charge.correlationID || correlationID,
     });
 
@@ -44,7 +44,7 @@ export class OpenPixGatewayService implements GatewayFactory {
     return updatedCharge;
   }
 
-  @OnEvent('openpix.charge.paid', { async: true })
+  @OnEvent('openpix.charges.paid', { async: true })
   async onChargePaid(payload: any): Promise<void> {
     const transaction = await this.openPixService.transaction.get(
       payload.transactionID,
@@ -71,6 +71,6 @@ export class OpenPixGatewayService implements GatewayFactory {
       metadata: transaction,
     });
 
-    this.eventEmitter.emit('charge.completed', updatedCharge);
+    this.eventEmitter.emit('charges.completed', updatedCharge);
   }
 }

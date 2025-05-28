@@ -9,7 +9,7 @@ export class ChargesListener {
   @OnChargePaid()
   async onChargePaid(charge: { gateway: string; payload: any }): Promise<void> {
     this.eventEmitter.emit(
-      `${charge.gateway.toLowerCase()}.charge.paid`,
+      `${charge.gateway.toLowerCase()}.charges.paid`,
       charge.payload.charge,
     );
   }
