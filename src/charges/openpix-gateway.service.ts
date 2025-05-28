@@ -22,17 +22,23 @@ export class OpenPixGatewayService implements GatewayFactory {
       correlationID: correlationID,
     });
 
-    const updatedCharge = await this.chargesRepository.update(charge.id, {
-      expiresIn: payment.expiresIn,
-      gatewayChargeID: payment.transactionID,
-      expiresAt: payment.expiresDate,
-      correlationID,
-      fee: payment.fee,
-      url: payment.paymentLinkUrl,
-      paymentMethod: 'PIX',
-      pix: payment?.paymentMethods?.pix,
-      metadata: payment,
-    });
+    const updatedCharge = await this.chargesRepository.update(
+      charge.id,
+      {
+        expiresIn: payment.expiresIn,
+        gatewayChargeID: payment.transactionID,
+        expiresAt: payment.expiresDate,
+        correlationID,
+        fee: payment.fee,
+        url: payment.paymentLinkUrl,
+        paymentMethod: 'PIX',
+        pix: payment?.paymentMethods?.pix,
+        metadata: payment,
+      },
+      {
+        relations: ['customer'],
+      },
+    );
 
     return updatedCharge;
   }

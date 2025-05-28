@@ -40,8 +40,13 @@ export class CustomersService {
       );
     }
 
+    const customers = await this.customersRepository.find({
+      user: { id: user.id },
+    });
+
     const customer = await this.customersRepository.create({
       ...createCustomerDto,
+      index: customers.length + 1,
       user: { id: user.id },
     });
 

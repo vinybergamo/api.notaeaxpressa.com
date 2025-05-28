@@ -19,6 +19,9 @@ import { Charge } from '@/charges/entities/charge.entity';
 })
 @Entity()
 export class Customer extends BaseSchema {
+  @Column({ default: 1 })
+  index: number;
+
   @ApiProperty({
     description: 'Name of the customer',
     example: 'Jane Doe',

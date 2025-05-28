@@ -8,10 +8,12 @@ import { OpenPixModule } from 'openpix-nestjs';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { OpenPixGatewayService } from './openpix-gateway.service';
 import { ChargesListener } from './charges.listerner';
+import { Customer } from '@/customers/entities/customer.entity';
+import { CustomersRepository } from '@/customers/customers.repository';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Charge]),
+    TypeOrmModule.forFeature([Charge, Customer]),
     OpenPixModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -31,6 +33,7 @@ import { ChargesListener } from './charges.listerner';
     ChargesRepository,
     OpenPixGatewayService,
     ChargesListener,
+    CustomersRepository,
   ],
   exports: [ChargesService, ChargesRepository],
 })

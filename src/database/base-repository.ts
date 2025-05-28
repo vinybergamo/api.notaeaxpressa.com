@@ -65,8 +65,12 @@ export class BaseRepository<T extends BaseSchema>
     return entity;
   }
 
-  async update(id: Id, data: DeepPartial<T>): Promise<T> {
-    const entity = await this.findByIdOrFail(id);
+  async update(
+    id: Id,
+    data: DeepPartial<T>,
+    options?: FindOneOptions<T>,
+  ): Promise<T> {
+    const entity = await this.findByIdOrFail(id, options);
     this.repository.merge(entity, data);
     await this.repository.save(entity);
     return entity;
