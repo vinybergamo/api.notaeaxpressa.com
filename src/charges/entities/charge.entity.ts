@@ -6,19 +6,15 @@ import { User } from '@/users/entities/user.entity';
 
 interface Pix {
   e2eID?: string;
-  txID?: string;
-  brCode?: string;
-  qrCodeImage?: string;
-  location?: string;
-  transactionID?: string;
-  method?: string;
-  status?: string;
-  identifier?: string;
-  value?: number;
-  additionalInfo?: {
-    key: string;
-    value: string;
-  }[];
+  method: string;
+  txId: string;
+  value: number;
+  status: string;
+  fee: number;
+  brCode: string;
+  transactionID: string;
+  identifier: string;
+  qrCodeImage: string;
 }
 
 @ApiSchema({

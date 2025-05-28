@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ChargesRepository } from './charges.repository';
 import { gateways } from './gateways.const';
-import { CreateChargeDto } from './dto/create-charge.dto';
+import { CreateOneStepChargeDto } from './dto/create-one-step-charge.dto';
 import { Charge } from './entities/charge.entity';
 import { OpenPixGatewayService } from './openpix-gateway.service';
 
@@ -12,11 +12,17 @@ export class ChargesService {
     private readonly openPixGatewayService: OpenPixGatewayService,
   ) {}
 
-  async create(user: UserRequest, createChargeDto: CreateChargeDto) {
-    this.validateGateway(createChargeDto.gateway, createChargeDto.methods);
+  async createOneStep(
+    user: UserRequest,
+    createChargeDto: CreateOneStepChargeDto,
+  ) {
+    this.validateGateway(createChargeDto.gateway, [
+      createChargeDto.paymentMethod,
+    ]);
 
     const charge = await this.chargesRepository.create({
       ...createChargeDto,
+      methods: [createChargeDto.paymentMethod],
       user: {
         id: user.id,
       },

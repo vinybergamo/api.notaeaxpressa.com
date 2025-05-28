@@ -1,14 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import {
-  IsArray,
-  IsInt,
-  IsOptional,
-  IsPositive,
-  IsString,
-} from 'class-validator';
+import { IsInt, IsOptional, IsPositive, IsString } from 'class-validator';
 
-export class CreateChargeDto {
+export class CreateOneStepChargeDto {
   @ApiProperty({
     description: 'ID of the customer associated with the charge',
     example: '123e4567-e89b-12d3-a456-426614174000',
@@ -67,14 +61,13 @@ export class CreateChargeDto {
   gateway: string;
 
   @ApiProperty({
-    description: 'Methods to be used for the charge',
-    example: ['PIX'],
+    description: 'Payment method to be used for the charge',
+    example: 'PIX',
     required: true,
-    type: [String],
+    type: String,
   })
-  @IsArray()
-  @IsString({ each: true })
-  methods: string[];
+  @IsString()
+  paymentMethod: string;
 
   @ApiProperty({
     description: 'Due date for the charge in ISO format',
