@@ -23,7 +23,6 @@ export class WebhooksService {
 
   private handleOpenPixWebhook(body: any) {
     const [gateway, event] = body.event.split(':');
-    console.log(openPixEventMapper[event]);
     this.eventEmitter.emit(openPixEventMapper[event], {
       gateway,
       payload: body,
