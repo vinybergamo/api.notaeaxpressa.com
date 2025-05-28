@@ -14,7 +14,12 @@ import {
 } from '@nestjs/common';
 import { applyDecorators } from '@nestjs/common';
 import { IsPublic } from './is-public.decorator';
-import { ApiBearerAuth, ApiExtraModels, ApiOperation } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiExtraModels,
+  ApiOperation,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { Cache } from './cache.decorator';
 import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { milliseconds } from 'date-fns';
@@ -97,6 +102,14 @@ function createDocumentation(
     if (documentation.extraModels) {
       decorators.push(ApiExtraModels(...documentation.extraModels));
     }
+
+    if (documentation.query) {
+      documentation.query.forEach((query) => {
+        decorators.push(ApiQuery(query));
+      });
+    }
+
+    delete documentation.query;
     delete documentation.extraModels;
     decorators.push(ApiOperation(documentation));
   }

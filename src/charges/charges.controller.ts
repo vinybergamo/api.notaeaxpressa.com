@@ -15,6 +15,18 @@ export class ChargesController {
     method: 'GET',
     documentation: {
       extraModels: [Charge],
+      query: [
+        {
+          name: 'relations',
+          description:
+            'Semicolon-Separated list of relations to include in the response',
+          required: false,
+          schema: {
+            type: 'string',
+            example: 'customer;subscription',
+          },
+        },
+      ],
       summary: 'List all charges',
       description:
         'Retrieve a paginated list of all charges associated with the authenticated user.',

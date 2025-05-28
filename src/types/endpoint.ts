@@ -1,5 +1,5 @@
 import { ExecutionContext, HttpStatus } from '@nestjs/common';
-import { ApiOperationOptions } from '@nestjs/swagger';
+import { ApiOperationOptions, ApiQueryOptions } from '@nestjs/swagger';
 import { Duration } from 'date-fns';
 import {
   ThrottlerGenerateKeyFunction,
@@ -27,6 +27,7 @@ export interface EndpointOptions {
   isPublic?: boolean;
   documentation?: ApiOperationOptions & {
     extraModels?: any[];
+    query?: ApiQueryOptions[];
   };
   cache?: {
     ttl?: Duration;

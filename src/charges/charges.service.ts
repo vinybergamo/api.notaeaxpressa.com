@@ -30,7 +30,7 @@ export class ChargesService {
     return this.chargesRepository.list(
       user.id,
       paginateQuery,
-      relations.split(';'),
+      relations.split(/[;,\s]+/).filter(Boolean) || [],
     );
   }
 

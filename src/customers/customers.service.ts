@@ -17,7 +17,7 @@ export class CustomersService {
     return this.customersRepository.list(
       user.id,
       paginateQuery,
-      relations.split(';'),
+      relations.split(/[;,\s]+/).filter(Boolean) || [],
     );
   }
 
