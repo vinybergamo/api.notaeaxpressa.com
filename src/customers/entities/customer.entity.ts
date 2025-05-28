@@ -5,12 +5,14 @@ import {
   Column,
   Entity,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
 import { BaseSchema } from '../../database/base-schema';
 import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 import { User } from '@/users/entities/user.entity';
 import phone from 'phone';
 import { isCNPJ, isCPF, isDocument } from '@/utils/is-document';
+import { Charge } from '@/charges/entities/charge.entity';
 
 @ApiSchema({
   name: 'CustomerEntity',
@@ -66,6 +68,24 @@ export class Customer extends BaseSchema {
   @Column({ nullable: true, default: null, type: 'text', array: true })
   tags: string[];
 
+  @ApiProperty({
+    description: 'Avatar of the customer',
+    example: 'https://example.com/avatar.jpg',
+    required: false,
+  })
+  @Column({ nullable: true })
+  avatar: string;
+
+  @OneToMany(() => Charge, (charge) => charge.customer, {
+    cascade: true,
+  })
+  @ApiProperty({
+    description: 'Charges associated with the customer',
+    type: () => [Charge],
+    required: false,
+  })
+  charges: Charge[];
+
   @ManyToOne(() => User, (user) => user.id, {
     nullable: true,
     onDelete: 'CASCADE',
@@ -76,14 +96,6 @@ export class Customer extends BaseSchema {
     type: () => User,
   })
   user: User;
-
-  @ApiProperty({
-    description: 'Avatar of the customer',
-    example: 'https://example.com/avatar.jpg',
-    required: false,
-  })
-  @Column({ nullable: true })
-  avatar: string;
 
   getPhoneCoutryCode() {
     const { isValid, countryCode, countryIso2 } = phone(`+${this.phone}`);

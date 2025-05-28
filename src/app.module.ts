@@ -9,6 +9,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { CustomersModule } from './customers/customers.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ChargesModule } from './charges/charges.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     UsersModule,
     AuthModule,
     CustomersModule,
+    ChargesModule,
   ],
   providers: [
     {

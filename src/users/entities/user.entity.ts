@@ -4,6 +4,7 @@ import { Exclude } from 'class-transformer';
 import { hashSync, compareSync, genSaltSync } from 'bcrypt';
 import { ApiHideProperty, ApiProperty, ApiSchema } from '@nestjs/swagger';
 import { Customer } from '@/customers/entities/customer.entity';
+import { Charge } from '@/charges/entities/charge.entity';
 
 @ApiSchema({
   name: 'UserEntity',
@@ -36,10 +37,25 @@ export class User extends BaseSchema {
   @Column({ nullable: true })
   avatar: string;
 
+  @ApiProperty({
+    description: 'Customers associated with the user',
+    example: () => [Customer],
+    type: () => [Customer],
+  })
   @OneToMany(() => Customer, (customer) => customer.user, {
     cascade: true,
   })
   customers: Customer[];
+
+  @ApiProperty({
+    description: 'Charges associated with the user',
+    example: () => [Charge],
+    type: () => [Charge],
+  })
+  @OneToMany(() => Charge, (charge) => charge.user, {
+    cascade: true,
+  })
+  charges: Charge[];
 
   hashPassword() {
     const salt = genSaltSync(10);
