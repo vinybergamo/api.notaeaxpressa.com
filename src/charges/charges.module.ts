@@ -10,6 +10,7 @@ import { OpenPixGatewayService } from './openpix-gateway.service';
 import { ChargesListener } from './charges.listerner';
 import { Customer } from '@/customers/entities/customer.entity';
 import { CustomersRepository } from '@/customers/customers.repository';
+import { ManualGatewayService } from './manual-gateway.service';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { CustomersRepository } from '@/customers/customers.repository';
     ChargesService,
     ChargesRepository,
     OpenPixGatewayService,
+    ManualGatewayService,
     ChargesListener,
     CustomersRepository,
   ],

@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity, ManyToOne } from 'typeorm';
 import { BaseSchema } from '../../database/base-schema';
 import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 import { Customer } from '@/customers/entities/customer.entity';
@@ -44,6 +44,23 @@ export class Charge extends BaseSchema {
   })
   @Column()
   amount: number;
+
+  @ApiProperty({
+    description: 'Total amount of the charge in cents, including fees',
+    example: 1050,
+    required: false,
+  })
+  @Column({ default: 0 })
+  liqAmount: number;
+
+  @ApiProperty({
+    description:
+      'Total amount of the charge in cents, including fees and additional fees',
+    example: 1100,
+    required: false,
+  })
+  @Column({ default: 0 })
+  totalAmount: number;
 
   @ApiProperty({
     description: 'Gateway used for the charge',
@@ -200,4 +217,16 @@ export class Charge extends BaseSchema {
     onDelete: 'CASCADE',
   })
   user: User;
+
+  @BeforeInsert()
+  setDefaults() {
+    this.totalAmount = this.amount + this.additionalFee;
+    this.liqAmount = this.totalAmount - (this.fee ?? 0);
+  }
+
+  @BeforeUpdate()
+  updateDefaults() {
+    this.totalAmount = this.amount + this.additionalFee;
+    this.liqAmount = this.totalAmount - (this.fee ?? 0);
+  }
 }

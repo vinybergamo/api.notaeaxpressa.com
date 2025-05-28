@@ -11,7 +11,7 @@ export class OpenPixGatewayService implements GatewayFactory {
   constructor(
     private readonly chargesRepository: ChargesRepository,
     private readonly openPixService: OpenPixService,
-    private readonly evetnEmitter: EventEmitter2,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async create(charge: Charge): Promise<Charge> {
@@ -19,7 +19,7 @@ export class OpenPixGatewayService implements GatewayFactory {
     const payment = await this.openPixService.charge.create({
       value: charge.amount,
       comment: charge.description,
-      correlationID: correlationID,
+      correlationID: charge.correlationID || correlationID,
     });
 
     const updatedCharge = await this.chargesRepository.update(
@@ -69,6 +69,6 @@ export class OpenPixGatewayService implements GatewayFactory {
       metadata: transaction,
     });
 
-    this.evetnEmitter.emit('charge.completed', updatedCharge);
+    this.eventEmitter.emit('charge.completed', updatedCharge);
   }
 }

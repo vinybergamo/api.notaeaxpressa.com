@@ -9,6 +9,8 @@ import { CreateOneStepChargeDto } from './dto/create-one-step-charge.dto';
 import { Charge } from './entities/charge.entity';
 import { OpenPixGatewayService } from './openpix-gateway.service';
 import { CustomersRepository } from '@/customers/customers.repository';
+import { format } from 'date-fns';
+import { ManualGatewayService } from './manual-gateway.service';
 
 @Injectable()
 export class ChargesService {
@@ -16,6 +18,7 @@ export class ChargesService {
     private readonly chargesRepository: ChargesRepository,
     private readonly openPixGatewayService: OpenPixGatewayService,
     private readonly customersRepository: CustomersRepository,
+    private readonly manualGatewayService: ManualGatewayService,
   ) {}
 
   async createOneStep(
@@ -43,6 +46,7 @@ export class ChargesService {
 
     const charge = await this.chargesRepository.create({
       ...createChargeDto,
+      correlationID: `${user.id}:${format(new Date(), 'yyyyMMddHHmmssSSS')}`,
       methods: [createChargeDto.paymentMethod],
       customer,
       user: {
@@ -58,6 +62,8 @@ export class ChargesService {
     switch (gateway) {
       case 'OPENPIX':
         return this.openPixGatewayService;
+      case 'MANUAL':
+        return this.manualGatewayService;
       default:
         throw new BadRequestException(
           `UNSUPPORTED_GATEWAY`,
