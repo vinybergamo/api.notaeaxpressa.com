@@ -10,6 +10,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { CustomersModule } from './customers/customers.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ChargesModule } from './charges/charges.module';
+import { WebhooksModule } from './webhooks/webhooks.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { ChargesModule } from './charges/charges.module';
     AuthModule,
     CustomersModule,
     ChargesModule,
+    WebhooksModule,
   ],
   providers: [
     {

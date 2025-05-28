@@ -7,6 +7,7 @@ import { ChargesRepository } from './charges.repository';
 import { OpenPixModule } from 'openpix-nestjs';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { OpenPixGatewayService } from './openpix-gateway.service';
+import { ChargesListener } from './charges.listerner';
 
 @Module({
   imports: [
@@ -25,7 +26,12 @@ import { OpenPixGatewayService } from './openpix-gateway.service';
     }),
   ],
   controllers: [ChargesController],
-  providers: [ChargesService, ChargesRepository, OpenPixGatewayService],
+  providers: [
+    ChargesService,
+    ChargesRepository,
+    OpenPixGatewayService,
+    ChargesListener,
+  ],
   exports: [ChargesService, ChargesRepository],
 })
 export class ChargesModule {}

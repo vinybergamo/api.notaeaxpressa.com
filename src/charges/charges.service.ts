@@ -28,7 +28,7 @@ export class ChargesService {
       },
     });
 
-    return this.chosenGateway(charge).process(charge);
+    return this.chosenGateway(charge).create(charge);
   }
 
   private chosenGateway(charge: Charge) {

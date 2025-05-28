@@ -4,15 +4,17 @@ import { ChargesRepository } from './charges.repository';
 import { Charge } from './entities/charge.entity';
 import { OpenPixService } from 'openpix-nestjs';
 import { format } from 'date-fns';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
 export class OpenPixGatewayService implements GatewayFactory {
   constructor(
     private readonly chargesRepository: ChargesRepository,
     private readonly openPixService: OpenPixService,
+    private readonly evetnEmitter: EventEmitter2,
   ) {}
 
-  async process(charge: Charge): Promise<Charge> {
+  async create(charge: Charge): Promise<Charge> {
     const correlationID = format(new Date(), 'yyyyMMddHHmmssSSS');
     const payment = await this.openPixService.charge.create({
       value: charge.amount,
@@ -33,5 +35,34 @@ export class OpenPixGatewayService implements GatewayFactory {
     });
 
     return updatedCharge;
+  }
+
+  @OnEvent('openpix.charge.paid', { async: true })
+  async onChargePaid(payload: any): Promise<void> {
+    const transaction = await this.openPixService.transaction.get(
+      payload.transactionID,
+    );
+    const payment = await this.openPixService.charge.get(payload.identifier);
+
+    const charge = await this.chargesRepository.findOne({
+      correlationID: payload.correlationID,
+    });
+
+    if (!charge) {
+      return;
+    }
+
+    if (charge.status === 'COMPLETED') {
+      return;
+    }
+
+    const updatedCharge = await this.chargesRepository.update(charge.id, {
+      pix: payment?.paymentMethods?.pix,
+      status: 'COMPLETED',
+      paidAt: new Date(transaction.charge.paidAt),
+      metadata: transaction,
+    });
+
+    this.evetnEmitter.emit('charge.completed', updatedCharge);
   }
 }

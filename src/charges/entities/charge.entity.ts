@@ -151,8 +151,23 @@ export class Charge extends BaseSchema {
   @Column({ nullable: true })
   expiresIn?: number;
 
+  @ApiProperty({
+    description: 'Timestamp when the charge expires, if applicable',
+    type: 'string',
+    format: 'date-time',
+    required: false,
+  })
   @Column({ nullable: true })
   expiresAt?: Date;
+
+  @ApiProperty({
+    description: 'Timestamp when the charge was paid, if applicable',
+    type: 'string',
+    format: 'date-time',
+    required: false,
+  })
+  @Column({ nullable: true })
+  paidAt?: Date;
 
   @ApiProperty({
     description: 'Pix payment details, if applicable',
