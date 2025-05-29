@@ -1,6 +1,8 @@
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { BaseSchema } from '../../database/base-schema';
 import { Subscription } from '@/subscriptions/entities/subscription.entity';
+import { PaymentMethodsEnum } from '@/charges/dto/pay-charge.dto';
+import { User } from '@/users/entities/user.entity';
 
 @Entity()
 export class Plan extends BaseSchema {
@@ -29,7 +31,7 @@ export class Plan extends BaseSchema {
   trialDays: number;
 
   @Column({ type: 'text', array: true, default: [] })
-  paymentMethods: string[];
+  paymentMethods: PaymentMethodsEnum[];
 
   @Column({ default: false })
   isActive: boolean;
@@ -38,4 +40,7 @@ export class Plan extends BaseSchema {
     cascade: true,
   })
   subscriptions: Subscription[];
+
+  @ManyToOne(() => User)
+  user: User;
 }

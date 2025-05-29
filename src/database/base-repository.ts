@@ -65,6 +65,13 @@ export class BaseRepository<T extends BaseSchema>
     return entity;
   }
 
+  async count(
+    criteria?: FindCriteria<T>,
+    options?: FindManyOptions<T>,
+  ): Promise<number> {
+    return this.repository.count({ where: criteria, ...options });
+  }
+
   async update(
     id: Id,
     data: DeepPartial<T>,

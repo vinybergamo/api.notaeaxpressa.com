@@ -7,6 +7,7 @@ import { Customer } from '@/customers/entities/customer.entity';
 import { Charge } from '@/charges/entities/charge.entity';
 import { Project } from '@/projects/entities/project.entity';
 import { Subscription } from '@/subscriptions/entities/subscription.entity';
+import { Plan } from '@/plans/entities/plan.entity';
 
 @ApiSchema({
   name: 'UserEntity',
@@ -79,6 +80,12 @@ export class User extends BaseSchema {
     nullable: true,
   })
   subscriptions: Subscription[];
+
+  @OneToMany(() => Plan, (plan) => plan.user, {
+    cascade: true,
+    nullable: true,
+  })
+  plans: Plan[];
 
   hashPassword() {
     const salt = genSaltSync(10);

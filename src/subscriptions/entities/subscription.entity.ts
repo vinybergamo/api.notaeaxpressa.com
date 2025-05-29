@@ -7,6 +7,9 @@ import { Plan } from '@/plans/entities/plan.entity';
 
 @Entity()
 export class Subscription extends BaseSchema {
+  @Column({ default: 1 })
+  index: number;
+
   @Column()
   startDate: Date;
 
