@@ -38,9 +38,10 @@ export class ChargesService {
     user: UserRequest,
     createChargeDto: CreateOneStepChargeDto,
   ) {
-    this.validateGateway(createChargeDto.gateway, [
+    this.validateGateway(
+      createChargeDto.gateway,
       createChargeDto.paymentMethod,
-    ]);
+    );
     const charges = await this.chargesRepository.find({
       user: { id: user.id },
     });
@@ -71,7 +72,7 @@ export class ChargesService {
       },
     });
 
-    return this.chosenGateway(charge).create(charge);
+    return this.chosenGateway(charge).create(charge, createChargeDto);
   }
 
   private chosenGateway(charge: Charge) {
@@ -89,7 +90,7 @@ export class ChargesService {
     }
   }
 
-  private validateGateway(gateway: string, methods: string[]): void {
+  private validateGateway(gateway: string, method: string): void {
     const validGateways = Object.keys(gateways).map((key) => key.toUpperCase());
 
     if (!validGateways.includes(gateway.toUpperCase())) {
@@ -100,13 +101,11 @@ export class ChargesService {
     }
     const gatewayMethods = gateways[gateway.toLowerCase()];
 
-    for (const method of methods) {
-      if (!gatewayMethods.includes(method)) {
-        throw new BadRequestException(
-          `INVALID_METHOD`,
-          `The method "${method}" is not supported by the "${gateway}" gateway.`,
-        );
-      }
+    if (!gatewayMethods.includes(method.toLowerCase())) {
+      throw new BadRequestException(
+        `INVALID_PAYMENT_METHOD`,
+        `The payment method "${method}" is not supported for the gateway "${gateway}". Supported methods are: ${gatewayMethods.join(', ').toUpperCase()}`,
+      );
     }
   }
 }
