@@ -19,7 +19,7 @@ export class Plan extends BaseSchema {
   @Column({ default: 'BRL' })
   currency: string;
 
-  @Column({ default: 'MONTHLY' })
+  @Column({ default: 'MONTH' })
   interval: string;
 
   @Column({ default: 1 })
