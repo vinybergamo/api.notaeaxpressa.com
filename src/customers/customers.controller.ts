@@ -17,6 +17,18 @@ export class CustomersController {
     documentation: {
       extraModels: [Customer],
       summary: 'List all customers',
+      query: [
+        {
+          name: 'relations',
+          description:
+            'Semicolon-Separated list of relations to include in the response',
+          required: false,
+          schema: {
+            type: 'string',
+            example: 'customer;subscription',
+          },
+        },
+      ],
       responses: {
         200: {
           description: 'List of customers',

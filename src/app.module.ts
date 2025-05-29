@@ -11,6 +11,7 @@ import { CustomersModule } from './customers/customers.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ChargesModule } from './charges/charges.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
+import { ProjectsModule } from './projects/projects.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { WebhooksModule } from './webhooks/webhooks.module';
     CustomersModule,
     ChargesModule,
     WebhooksModule,
+    ProjectsModule,
   ],
   providers: [
     {

@@ -5,6 +5,7 @@ import { hashSync, compareSync, genSaltSync } from 'bcrypt';
 import { ApiHideProperty, ApiProperty, ApiSchema } from '@nestjs/swagger';
 import { Customer } from '@/customers/entities/customer.entity';
 import { Charge } from '@/charges/entities/charge.entity';
+import { Project } from '@/projects/entities/project.entity';
 
 @ApiSchema({
   name: 'UserEntity',
@@ -56,6 +57,16 @@ export class User extends BaseSchema {
     cascade: true,
   })
   charges: Charge[];
+
+  @ApiProperty({
+    description: 'Projects associated with the user',
+    example: () => [Project],
+    type: () => [Project],
+  })
+  @OneToMany(() => Project, (project) => project.user, {
+    cascade: true,
+  })
+  projects: Project[];
 
   hashPassword() {
     const salt = genSaltSync(10);
