@@ -4,6 +4,8 @@ import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 import { Customer } from '@/customers/entities/customer.entity';
 import { User } from '@/users/entities/user.entity';
 import * as math from 'mathjs';
+import { Subscription } from '@/subscriptions/entities/subscription.entity';
+import { GatewayEnum, PaymentMethodsEnum } from '../dto/pay-charge.dto';
 
 interface Pix {
   method: string;
@@ -30,6 +32,7 @@ export class Charge extends BaseSchema {
   @ApiProperty({
     description: 'Unique identifier for the charge',
     example: '12345',
+    required: false,
   })
   @Column({ nullable: true })
   correlationID?: string;
@@ -69,8 +72,10 @@ export class Charge extends BaseSchema {
   @ApiProperty({
     description: 'Gateway used for the charge',
     example: 'OPENPIX',
+    required: false,
+    enum: GatewayEnum,
   })
-  @Column()
+  @Column({ nullable: true })
   gateway: string;
 
   @ApiProperty({
@@ -139,13 +144,15 @@ export class Charge extends BaseSchema {
 
   @ApiProperty({
     description: 'List of payment methods available for the charge',
-    type: [String],
+    type: String,
+    isArray: true,
+    enum: PaymentMethodsEnum,
     example: ['CREDIT_CARD', 'PIX', 'BOLETO'],
     required: false,
     default: [],
   })
   @Column({ default: [], type: 'text', array: true })
-  methods: string[];
+  methods: PaymentMethodsEnum[];
 
   @ApiProperty({
     description: 'Payment method used for the charge',
@@ -192,20 +199,30 @@ export class Charge extends BaseSchema {
 
   @ApiProperty({
     description: 'Pix payment details, if applicable',
-    type: 'object',
-    additionalProperties: false,
-    example: {
-      method: 'PIX',
-      txId: 'tx_1234567890',
-      value: 1000,
-      status: 'PAID',
-      fee: 10,
-      brCode:
-        '00020101021126640014BR.GOV.BCB.PIX0114e2eID1234567890123456789012345678905204000053039865404100000000000000000000000000006304A0B1',
-      transactionID: 'tx_1234567890',
-      identifier: 'id_1234567890',
-      qrCodeImage: 'https://example.com/qr-code.png',
-    },
+    allOf: [
+      {
+        type: 'object',
+        properties: {
+          method: { type: 'string', example: 'PIX_COB' },
+          txId: { type: 'string', example: '1234567890' },
+          value: { type: 'number', example: 1000 },
+          status: { type: 'string', example: 'COMPLETED' },
+          fee: { type: 'number', example: 10 },
+          brCode: {
+            type: 'string',
+            example:
+              '00020101021126640014BR.GOV.BCB.PIX0114e2eID1234567890123456789012345678905204000053039865404100000000000000000000000000006304A0B1',
+          },
+          transactionID: { type: 'string', example: '1234567890' },
+          identifier: { type: 'string', example: '1234567890' },
+          qrCodeImage: {
+            type: 'string',
+            example: 'https://example.com/qr-code.png',
+          },
+        },
+      },
+    ],
+    required: false,
   })
   @Column({ type: 'jsonb', nullable: true })
   pix?: Pix;
@@ -233,6 +250,12 @@ export class Charge extends BaseSchema {
     onDelete: 'CASCADE',
   })
   user: User;
+
+  @ManyToOne(() => Subscription, (subscription) => subscription.charges, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  subscription: Subscription;
 
   @BeforeInsert()
   setDefaults() {

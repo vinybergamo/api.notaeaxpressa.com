@@ -10,11 +10,11 @@ import {
 } from 'class-validator';
 import { CreditCardDto } from './credit-card.dto';
 
-export enum Gateway {
+export enum GatewayEnum {
   OPENPIX = 'OPENPIX',
 }
 
-export enum PaymentMethods {
+export enum PaymentMethodsEnum {
   PIX = 'PIX',
   CREDIT_CARD = 'CREDIT_CARD',
 }
@@ -25,10 +25,10 @@ export class PayChargeDto {
     example: 'OPENPIX',
     required: true,
     type: String,
-    enum: Gateway,
+    enum: GatewayEnum,
   })
   @IsString()
-  @IsEnum(Gateway)
+  @IsEnum(GatewayEnum)
   @Transform(({ value }: { value: string }) => value.toUpperCase())
   gateway: string;
 
@@ -37,12 +37,12 @@ export class PayChargeDto {
     example: 'PIX',
     required: true,
     type: String,
-    enum: PaymentMethods,
+    enum: PaymentMethodsEnum,
   })
   @IsString()
-  @IsEnum(PaymentMethods)
+  @IsEnum(PaymentMethodsEnum)
   @Transform(({ value }: { value: string }) => value.toUpperCase())
-  paymentMethod: string;
+  paymentMethod: PaymentMethodsEnum;
 
   @ApiProperty({
     description: 'Credit card details if payment method is CREDIT_CARD',
@@ -53,6 +53,6 @@ export class PayChargeDto {
   @IsDefined()
   @Type(() => CreditCardDto)
   @ValidateNested({ each: true })
-  @ValidateIf((o) => o.paymentMethod === PaymentMethods.CREDIT_CARD)
+  @ValidateIf((o) => o.paymentMethod === PaymentMethodsEnum.CREDIT_CARD)
   creditCard: CreditCardDto;
 }

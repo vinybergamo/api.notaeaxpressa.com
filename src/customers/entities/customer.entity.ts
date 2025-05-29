@@ -14,6 +14,7 @@ import phone from 'phone';
 import { isCNPJ, isCPF, isDocument } from '@/utils/is-document';
 import { Charge } from '@/charges/entities/charge.entity';
 import { Project } from '@/projects/entities/project.entity';
+import { Subscription } from '@/subscriptions/entities/subscription.entity';
 
 @ApiSchema({
   name: 'CustomerEntity',
@@ -111,6 +112,17 @@ export class Customer extends BaseSchema {
     nullable: true,
   })
   projects: Project[];
+
+  @ApiProperty({
+    description: 'Subscriptions associated with the customer',
+    type: () => [Subscription],
+    required: false,
+  })
+  @OneToMany(() => Subscription, (subscription) => subscription.customer, {
+    cascade: true,
+    nullable: true,
+  })
+  subscriptions: Subscription[];
 
   getPhoneCoutryCode() {
     const { isValid, countryCode, countryIso2 } = phone(`+${this.phone}`);

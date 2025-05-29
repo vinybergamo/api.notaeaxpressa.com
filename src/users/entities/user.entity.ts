@@ -6,6 +6,7 @@ import { ApiHideProperty, ApiProperty, ApiSchema } from '@nestjs/swagger';
 import { Customer } from '@/customers/entities/customer.entity';
 import { Charge } from '@/charges/entities/charge.entity';
 import { Project } from '@/projects/entities/project.entity';
+import { Subscription } from '@/subscriptions/entities/subscription.entity';
 
 @ApiSchema({
   name: 'UserEntity',
@@ -67,6 +68,17 @@ export class User extends BaseSchema {
     cascade: true,
   })
   projects: Project[];
+
+  @ApiProperty({
+    description: 'Subscriptions associated with the user',
+    example: () => [Subscription],
+    type: () => [Subscription],
+  })
+  @OneToMany(() => Subscription, (subscription) => subscription.user, {
+    cascade: true,
+    nullable: true,
+  })
+  subscriptions: Subscription[];
 
   hashPassword() {
     const salt = genSaltSync(10);

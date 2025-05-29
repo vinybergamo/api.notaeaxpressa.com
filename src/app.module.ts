@@ -12,6 +12,9 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ChargesModule } from './charges/charges.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { ProjectsModule } from './projects/projects.module';
+import { PlansModule } from './plans/plans.module';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -40,6 +43,7 @@ import { ProjectsModule } from './projects/projects.module';
     EventEmitterModule.forRoot({
       global: true,
     }),
+    ScheduleModule.forRoot(),
     DatabaseModule,
     UsersModule,
     AuthModule,
@@ -47,6 +51,8 @@ import { ProjectsModule } from './projects/projects.module';
     ChargesModule,
     WebhooksModule,
     ProjectsModule,
+    PlansModule,
+    SubscriptionsModule,
   ],
   providers: [
     {
