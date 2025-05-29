@@ -41,6 +41,9 @@ export class Plan extends BaseSchema {
   })
   subscriptions: Subscription[];
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, (user) => user.plans, {
+    onDelete: 'CASCADE',
+    nullable: false,
+  })
   user: User;
 }
