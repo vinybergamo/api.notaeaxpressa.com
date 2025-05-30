@@ -16,6 +16,7 @@ import { PlansModule } from './plans/plans.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ReportsModule } from './reports/reports.module';
+import { ApplicationsModule } from './applications/applications.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { ReportsModule } from './reports/reports.module';
     PlansModule,
     SubscriptionsModule,
     ReportsModule,
+    ApplicationsModule,
   ],
   providers: [
     {
