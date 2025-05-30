@@ -40,7 +40,6 @@ export class AuthGuard implements CanActivate {
       token,
     });
 
-    console.log('isBlackListed', isBlackListed);
     if (isBlackListed) {
       throw new UnauthorizedException('UNAUTHORIZED');
     }
