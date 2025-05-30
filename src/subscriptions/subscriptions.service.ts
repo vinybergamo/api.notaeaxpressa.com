@@ -164,6 +164,7 @@ export class SubscriptionsService {
     await this.chargesRepository.create({
       index: chargesCount + 1,
       amount: plan.price,
+      additionalFee: plan.fee,
       currency: plan.currency,
       methods: plan.paymentMethods,
       correlationID,

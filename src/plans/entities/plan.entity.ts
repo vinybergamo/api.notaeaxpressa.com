@@ -18,6 +18,9 @@ export class Plan extends BaseSchema {
   @Column()
   price: number;
 
+  @Column({ default: 0 })
+  fee: number;
+
   @Column({ default: 'BRL' })
   currency: string;
 
