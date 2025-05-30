@@ -18,6 +18,7 @@ import {
   ApiBearerAuth,
   ApiExtraModels,
   ApiOperation,
+  ApiParam,
   ApiQuery,
 } from '@nestjs/swagger';
 import { Cache } from './cache.decorator';
@@ -106,6 +107,12 @@ function createDocumentation(
     if (documentation.query) {
       documentation.query.forEach((query) => {
         decorators.push(ApiQuery(query));
+      });
+    }
+
+    if (documentation.params) {
+      documentation.params.forEach((param) => {
+        decorators.push(ApiParam(param));
       });
     }
 

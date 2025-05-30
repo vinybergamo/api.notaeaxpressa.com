@@ -3,7 +3,7 @@ import { GatewayFactory } from './gateway.factory';
 import { ChargesRepository } from './charges.repository';
 import { Charge } from './entities/charge.entity';
 import { OpenPixService } from 'openpix-nestjs';
-import { format } from 'date-fns';
+import { add, format } from 'date-fns';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import * as math from 'mathjs';
 import { PayChargeDto } from './dto/pay-charge.dto';
@@ -18,6 +18,88 @@ export class OpenPixGatewayService implements GatewayFactory {
 
   async process(charge: Charge, payChargeDto: PayChargeDto): Promise<Charge> {
     const correlationID = format(new Date(), 'yyyyMMddHHmmssSSS');
+
+    const existsPaymet = await this.openPixService.charge
+      .get(charge.correlationID)
+      .catch(() => null);
+
+    if (!!existsPaymet) {
+      const paymentStatus = existsPaymet.paymentMethods?.pix?.status;
+      if (paymentStatus === 'COMPLETED') {
+        return this.chargesRepository.update(
+          charge.id,
+          {
+            status: 'COMPLETED',
+            paidAt: new Date(existsPaymet.paidAt),
+            gatewayChargeID: existsPaymet.transactionID,
+            expiresIn: existsPaymet.expiresIn,
+            expiresAt: existsPaymet.expiresDate,
+            correlationID: charge.correlationID || correlationID,
+            fee: existsPaymet.fee,
+            url: existsPaymet.paymentLinkUrl,
+            paymentMethod: 'PIX',
+            pix: existsPaymet?.paymentMethods?.pix,
+            metadata: existsPaymet,
+          },
+          {
+            relations: ['customer'],
+          },
+        );
+      }
+
+      if (paymentStatus === 'ACTIVE') {
+        return await this.chargesRepository.update(
+          charge.id,
+          {
+            gateway: payChargeDto.gateway,
+            expiresIn: existsPaymet.expiresIn,
+            gatewayChargeID: existsPaymet.transactionID,
+            expiresAt: existsPaymet.expiresDate,
+            correlationID: charge.correlationID || correlationID,
+            fee: existsPaymet.fee,
+            url: existsPaymet.paymentLinkUrl,
+            paymentMethod: 'PIX',
+            pix: existsPaymet?.paymentMethods?.pix,
+            metadata: existsPaymet,
+          },
+          {
+            relations: ['customer'],
+          },
+        );
+      }
+
+      if (paymentStatus === 'EXPIRED') {
+        const newDate = add(new Date(), {
+          days: 1,
+        });
+
+        const updatedPayment = await this.openPixService.charge.update(
+          charge.correlationID,
+          {
+            expiresDate: newDate,
+          },
+        );
+
+        return await this.chargesRepository.update(
+          charge.id,
+          {
+            gateway: payChargeDto.gateway,
+            expiresIn: updatedPayment.expiresIn,
+            gatewayChargeID: updatedPayment.transactionID,
+            correlationID: charge.correlationID || correlationID,
+            fee: updatedPayment.fee,
+            url: updatedPayment.paymentLinkUrl,
+            paymentMethod: 'PIX',
+            pix: updatedPayment?.paymentMethods?.pix,
+            metadata: updatedPayment,
+          },
+          {
+            relations: ['customer'],
+          },
+        );
+      }
+    }
+
     const payment = await this.openPixService.charge.create({
       value: math.add(charge.amount, charge.additionalFee ?? 0),
       comment: charge.description ?? undefined,

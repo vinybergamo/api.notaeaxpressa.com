@@ -1,4 +1,4 @@
-import { Body, Controller, Query } from '@nestjs/common';
+import { Body, Controller, Param, Query } from '@nestjs/common';
 import { ChargesService } from './charges.service';
 import { Endpoint } from '@/helpers/decorators/endpoint.decorator';
 import { CreateOneStepChargeDto } from './dto/create-one-step-charge.dto';
@@ -6,6 +6,7 @@ import { Me } from '@/helpers/decorators/me.decorator';
 import { Charge } from './entities/charge.entity';
 import { Paginate, PaginateQuery } from 'nestjs-paginate';
 import { buildPaginatedDocs } from '@/utils/build-paginated-docs';
+import { PayChargeDto } from './dto/pay-charge.dto';
 
 @Controller('charges')
 export class ChargesController {
@@ -72,5 +73,55 @@ export class ChargesController {
     @Body() createChargeDto: CreateOneStepChargeDto,
   ) {
     return this.chargesService.createOneStep(me, createChargeDto);
+  }
+
+  @Endpoint({
+    method: 'POST',
+    path: ':chargeId/pay',
+    isPublic: true,
+    documentation: {
+      summary: 'Pay a charge',
+      description:
+        'Process a payment for a specific charge using the specified gateway.',
+      params: [
+        {
+          name: 'chargeId',
+          required: true,
+          description: 'ID of the charge to pay',
+          schema: {
+            type: 'string',
+            format: 'uuid or integer',
+            examples: {
+              uuid: {
+                value: '550e8400-e29b-41d4-a716-446655440000',
+                description: 'Example UUID charge ID',
+              },
+              integer: {
+                value: '123456',
+                description: 'Example integer charge ID',
+              },
+            },
+          },
+        },
+      ],
+      responses: {
+        200: {
+          description: 'Charge paid successfully',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ChargeEntity',
+              },
+            },
+          },
+        },
+        400: {
+          description: 'Bad Request - Invalid payment method or gateway',
+        },
+      },
+    },
+  })
+  pay(@Body() payChargeDto: PayChargeDto, @Param('chargeId') chargeId: Id) {
+    return this.chargesService.pay(chargeId, payChargeDto);
   }
 }

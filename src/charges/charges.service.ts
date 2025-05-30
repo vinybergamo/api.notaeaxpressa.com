@@ -6,7 +6,6 @@ import {
 import { ChargesRepository } from './charges.repository';
 import { gateways } from './gateways.const';
 import { CreateOneStepChargeDto } from './dto/create-one-step-charge.dto';
-import { Charge } from './entities/charge.entity';
 import { OpenPixGatewayService } from './openpix-gateway.service';
 import { CustomersRepository } from '@/customers/customers.repository';
 import { format } from 'date-fns';
@@ -35,21 +34,17 @@ export class ChargesService {
     );
   }
 
-  async pay(user: UserRequest, chargeId: Id, payChargeDto: PayChargeDto) {
+  async pay(chargeId: Id, payChargeDto: PayChargeDto) {
     const charge = await this.chargesRepository.findByIdOrFail(chargeId, {
       relations: ['user'],
     });
 
-    if (charge.user.id !== user.id) {
-      throw new NotFoundException(
-        'CHARGE_NOT_FOUND',
-        'Charge not found or does not belong to the user.',
-      );
-    }
+    this.validateGateway(payChargeDto.gateway, payChargeDto.paymentMethod);
 
-    this.validateGateway(charge.gateway, payChargeDto.paymentMethod);
-
-    return this.chosenGateway(charge).process(charge, payChargeDto);
+    return this.chosenGateway(payChargeDto.gateway).process(
+      charge,
+      payChargeDto,
+    );
   }
 
   async createOneStep(
@@ -90,12 +85,14 @@ export class ChargesService {
       },
     });
 
-    return this.chosenGateway(charge).process(charge, createChargeDto);
+    return this.chosenGateway(createChargeDto.gateway).process(
+      charge,
+      createChargeDto,
+    );
   }
 
-  private chosenGateway(charge: Charge) {
-    const gateway = charge.gateway.toUpperCase();
-    switch (gateway) {
+  private chosenGateway(gateway: string) {
+    switch (gateway.toUpperCase().trim()) {
       case 'OPENPIX':
         return this.openPixGatewayService;
       case 'MANUAL':
@@ -111,13 +108,15 @@ export class ChargesService {
   private validateGateway(gateway: string, method: string): void {
     const validGateways = Object.keys(gateways).map((key) => key.toUpperCase());
 
-    if (!validGateways.includes(gateway.toUpperCase())) {
+    if (!validGateways.includes(gateway.toUpperCase().trim())) {
       throw new BadRequestException(
         `INVALID_GATEWAY`,
         `The gateway "${gateway}" is not supported. Supported gateways are: ${validGateways.join(', ').toUpperCase()}`,
       );
     }
-    const gatewayMethods = gateways[gateway.toLowerCase()];
+    const gatewayMethods = gateways[gateway.toLowerCase()].map((m) =>
+      m.toLowerCase(),
+    );
 
     if (!gatewayMethods.includes(method.toLowerCase())) {
       throw new BadRequestException(
