@@ -13,12 +13,13 @@ export class ManualGatewayService implements GatewayFactory {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  create(charge: Charge, payChargeDto: PayChargeDto): Promise<Charge> {
+  process(charge: Charge, payChargeDto: PayChargeDto): Promise<Charge> {
     const updatedCharge = this.chargesRepository.update(charge.id, {
       status: 'COMPLETED',
       gatewayChargeID: `MANUAL:${randomUUID()}`,
       paidAt: new Date(),
       gateway: payChargeDto.gateway,
+      paymentMethod: payChargeDto.paymentMethod,
     });
 
     this.eventEmitter.emit('charge.completed', updatedCharge);

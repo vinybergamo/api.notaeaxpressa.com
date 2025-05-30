@@ -12,6 +12,7 @@ import { CustomersRepository } from '@/customers/customers.repository';
 import { format } from 'date-fns';
 import { ManualGatewayService } from './manual-gateway.service';
 import { PaginateQuery } from 'nestjs-paginate';
+import { PayChargeDto } from './dto/pay-charge.dto';
 
 @Injectable()
 export class ChargesService {
@@ -32,6 +33,23 @@ export class ChargesService {
       paginateQuery,
       relations.split(/[;,\s]+/).filter(Boolean) || [],
     );
+  }
+
+  async pay(user: UserRequest, chargeId: Id, payChargeDto: PayChargeDto) {
+    const charge = await this.chargesRepository.findByIdOrFail(chargeId, {
+      relations: ['user'],
+    });
+
+    if (charge.user.id !== user.id) {
+      throw new NotFoundException(
+        'CHARGE_NOT_FOUND',
+        'Charge not found or does not belong to the user.',
+      );
+    }
+
+    this.validateGateway(charge.gateway, payChargeDto.paymentMethod);
+
+    return this.chosenGateway(charge).process(charge, payChargeDto);
   }
 
   async createOneStep(
@@ -64,7 +82,7 @@ export class ChargesService {
     const charge = await this.chargesRepository.create({
       ...createChargeDto,
       index: charges.length + 1,
-      correlationID: `${user.id}${format(new Date(), 'yyyyMMddHHmmssSSS')}`,
+      correlationID: `user:${user.id}_${format(new Date(), 'yyyyMMddHHmmssSSS')}`,
       methods: [createChargeDto.paymentMethod],
       customer,
       user: {
@@ -72,7 +90,7 @@ export class ChargesService {
       },
     });
 
-    return this.chosenGateway(charge).create(charge, createChargeDto);
+    return this.chosenGateway(charge).process(charge, createChargeDto);
   }
 
   private chosenGateway(charge: Charge) {

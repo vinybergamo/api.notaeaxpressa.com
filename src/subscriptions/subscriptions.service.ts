@@ -141,7 +141,7 @@ export class SubscriptionsService {
       return;
     }
 
-    const correlationID = `sub_${subscription.id}_user${subscription.user.id}_${format(
+    const correlationID = `sub:${subscription.id}_user:${subscription.user.id}_${format(
       new Date(),
       'yyyyMMddHHmmssSSS',
     )}`;

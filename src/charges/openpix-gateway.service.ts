@@ -16,7 +16,7 @@ export class OpenPixGatewayService implements GatewayFactory {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  async create(charge: Charge, payChargeDto: PayChargeDto): Promise<Charge> {
+  async process(charge: Charge, payChargeDto: PayChargeDto): Promise<Charge> {
     const correlationID = format(new Date(), 'yyyyMMddHHmmssSSS');
     const payment = await this.openPixService.charge.create({
       value: math.add(charge.amount, charge.additionalFee ?? 0),
