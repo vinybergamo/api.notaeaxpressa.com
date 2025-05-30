@@ -1,9 +1,14 @@
 import { Module } from '@nestjs/common';
 import { PlansService } from './plans.service';
 import { PlansController } from './plans.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Plan } from './entities/plan.entity';
+import { PlansRepository } from './plans.repository';
 
 @Module({
+  imports: [TypeOrmModule.forFeature([Plan])],
   controllers: [PlansController],
-  providers: [PlansService],
+  providers: [PlansService, PlansRepository],
+  exports: [PlansService, PlansRepository],
 })
 export class PlansModule {}
