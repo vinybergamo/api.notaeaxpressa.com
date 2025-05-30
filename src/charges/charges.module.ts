@@ -22,7 +22,8 @@ import { ChargesSubscriber } from './charges.subcriber';
       useFactory: async (configService: ConfigService) => {
         const logger = new Logger('OpenPixModule');
         const appId = configService.get('OPENPIX_APP_ID');
-        const sandbox = configService.get<boolean>('OPENPIX_SANDBOX', false);
+        const sandbox =
+          configService.get<string>('OPENPIX_SANDBOX', 'false') === 'true';
 
         if (sandbox) {
           logger.warn(
