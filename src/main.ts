@@ -15,12 +15,13 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const config = app.get(ConfigService);
   const port = config.get('PORT', 3333);
+  const prefix = config.get('APP_PREFIX', 'api');
   const reflector = app.get(Reflector);
   const appUrl = config.get<string | undefined>('APP_URL')?.split(/[,;]/);
 
   app.enableCors();
   app.useGlobalFilters(new HttpExceptionFilter());
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix(prefix);
   app.enableVersioning({
     type: VersioningType.URI,
     defaultVersion: '1',
