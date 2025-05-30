@@ -92,7 +92,9 @@ export class SubscriptionsService {
     return subscription;
   }
 
-  @Cron(CronExpression.EVERY_MINUTE)
+  @Cron(CronExpression.EVERY_MINUTE, {
+    timeZone: 'America/Sao_Paulo',
+  })
   async handleSubscriptions(): Promise<void> {
     const now = new Date();
     const subscriptions = await this.subscriptionsRepository.find(
