@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { ChargesService } from './charges.service';
 import { ChargesController } from './charges.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -20,8 +20,15 @@ import { ChargesSubscriber } from './charges.subcriber';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => {
+        const logger = new Logger('OpenPixModule');
         const appId = configService.get('OPENPIX_APP_ID');
         const sandbox = configService.get<boolean>('OPENPIX_SANDBOX', false);
+
+        if (sandbox) {
+          logger.warn(
+            'OpenPix is running in sandbox mode. Use with caution in production environments.',
+          );
+        }
         return {
           appId,
           sandbox,
