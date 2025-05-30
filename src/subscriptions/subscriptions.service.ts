@@ -115,9 +115,19 @@ export class SubscriptionsService {
       `[${format(now, 'yyyy-MM-dd HH:mm:ss')}] Processing ${subscriptions.length} subscriptions`,
     );
 
-    subscriptions.forEach(async (subscription) =>
-      this.processSubscription(subscription),
+    const results = await Promise.allSettled(
+      subscriptions.map((subscription) =>
+        this.processSubscription(subscription),
+      ),
     );
+
+    results.forEach((result, index) => {
+      if (result.status === 'rejected') {
+        this.logger.error(
+          `Failed to process subscription ${subscriptions[index].id}: ${result.reason}`,
+        );
+      }
+    });
   }
 
   private async processSubscription(subscription: Subscription): Promise<void> {
@@ -180,7 +190,7 @@ export class SubscriptionsService {
           years: subscription.plan.intervalCount,
         });
       default:
-        add(now, {
+        return add(now, {
           days: subscription.plan.intervalCount,
         });
     }
