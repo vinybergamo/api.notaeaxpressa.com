@@ -12,6 +12,7 @@ import { format } from 'date-fns';
 import { ManualGatewayService } from './manual-gateway.service';
 import { PaginateQuery } from 'nestjs-paginate';
 import { PayChargeDto } from './dto/pay-charge.dto';
+import { txIdGenerate } from '@/utils/txid-generate';
 
 @Injectable()
 export class ChargesService {
@@ -77,7 +78,9 @@ export class ChargesService {
     const charge = await this.chargesRepository.create({
       ...createChargeDto,
       index: charges.length + 1,
-      correlationID: `user:${user.id}_${format(new Date(), 'yyyyMMddHHmmssSSS')}`,
+      correlationID: txIdGenerate(
+        `USER${user.id}T${format(new Date(), 'yyyyMMddHHmmssSSS')}`,
+      ),
       methods: [createChargeDto.paymentMethod],
       customer,
       user: {

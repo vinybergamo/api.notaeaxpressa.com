@@ -8,6 +8,7 @@ import { ChargesRepository } from '@/charges/charges.repository';
 import { CreateSubscriptionDto } from './dto/crate-subscription';
 import { CustomersRepository } from '@/customers/customers.repository';
 import { PlansRepository } from '@/plans/plans.repository';
+import { txIdGenerate } from '@/utils/txid-generate';
 
 @Injectable()
 export class SubscriptionsService {
@@ -141,10 +142,12 @@ export class SubscriptionsService {
       return;
     }
 
-    const correlationID = `sub:${subscription.id}_user:${subscription.user.id}_${format(
-      new Date(),
-      'yyyyMMddHHmmssSSS',
-    )}`;
+    const correlationID = txIdGenerate(
+      `SUB${subscription.id}USER${subscription.user.id}T${format(
+        new Date(),
+        'yyyyMMddHHmmssSSS',
+      )}`,
+    );
     const nextBillingDate = this.getNextBillingDate(subscription);
     const plan = subscription.plan;
     const customer = subscription.customer;
