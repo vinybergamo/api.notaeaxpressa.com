@@ -6,6 +6,7 @@ import { User } from '@/users/entities/user.entity';
 import * as math from 'mathjs';
 import { Subscription } from '@/subscriptions/entities/subscription.entity';
 import { GatewayEnum, PaymentMethodsEnum } from '../dto/pay-charge.dto';
+import { Exclude } from 'class-transformer';
 
 interface Pix {
   method: string;
@@ -227,11 +228,7 @@ export class Charge extends BaseSchema {
   @Column({ type: 'jsonb', nullable: true })
   pix?: Pix;
 
-  @ApiProperty({
-    description: 'Metadata associated with the charge',
-    type: 'object',
-    additionalProperties: false,
-  })
+  @Exclude()
   @Column({ type: 'jsonb', nullable: true })
   metadata?: Record<string, any>;
 
