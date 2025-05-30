@@ -6,10 +6,12 @@ import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Application } from './entities/application.entity';
 import { ApplicationsRepository } from './applications.repository';
+import { TokenBlackList } from '@/tokens/entities/token.entity';
+import { TokensBlackListsRepository } from '@/tokens/tokens.repository';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Application]),
+    TypeOrmModule.forFeature([Application, TokenBlackList]),
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
@@ -18,7 +20,11 @@ import { ApplicationsRepository } from './applications.repository';
     }),
   ],
   controllers: [ApplicationsController],
-  providers: [ApplicationsService, ApplicationsRepository],
+  providers: [
+    ApplicationsService,
+    ApplicationsRepository,
+    TokensBlackListsRepository,
+  ],
   exports: [ApplicationsService, ApplicationsRepository],
 })
 export class ApplicationsModule {}

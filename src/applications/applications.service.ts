@@ -4,12 +4,15 @@ import { CreateApplicationDto } from './dto/create-application.dto';
 import { JwtService } from '@nestjs/jwt';
 import { mask } from '@/utils/mask';
 import { ILike } from 'typeorm';
+import { TokensBlackListsRepository } from '@/tokens/tokens.repository';
+import { RegenerateTokenDto } from './dto/regenerate-token.dto';
 
 @Injectable()
 export class ApplicationsService {
   constructor(
     private readonly applicationsRepository: ApplicationsRepository,
     private readonly jwtService: JwtService,
+    private readonly tokensBlackListsRepository: TokensBlackListsRepository,
   ) {}
 
   async create(user: UserRequest, createApplicationDto: CreateApplicationDto) {
@@ -44,6 +47,49 @@ export class ApplicationsService {
     const token = await this.generateJwtToken(
       application.id,
       createApplicationDto.tokenExpiresIn,
+    );
+
+    const updatedApplication = await this.applicationsRepository.update(
+      application.id,
+      {
+        token,
+        maskedToken: mask(token, 4),
+      },
+    );
+
+    return {
+      ...updatedApplication,
+      token,
+    };
+  }
+
+  async regenerateToken(
+    user: UserRequest,
+    applicationId: Id,
+    regenerateTokenDto: RegenerateTokenDto,
+  ) {
+    const application = await this.applicationsRepository.findByIdOrFail(
+      applicationId,
+      {
+        relations: ['user'],
+      },
+    );
+
+    if (application.user.id !== user.id) {
+      throw new NotFoundException(
+        'APPLICATION_NOT_FOUND',
+        'Application not found or does not belong to the user.',
+      );
+    }
+
+    await this.tokensBlackListsRepository.create({
+      token: application.token,
+      reason: 'REGENERATE',
+    });
+
+    const token = await this.generateJwtToken(
+      application.id,
+      regenerateTokenDto.tokenExpiresIn,
     );
 
     const updatedApplication = await this.applicationsRepository.update(

@@ -9,6 +9,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { isPublicMetaKey } from '../decorators/is-public.decorator';
 import { ApplicationsRepository } from '@/applications/applications.repository';
+import { TokensBlackListsRepository } from '@/tokens/tokens.repository';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -17,6 +18,7 @@ export class AuthGuard implements CanActivate {
     private readonly authService: AuthService,
     private readonly usersRepository: UsersRepository,
     private readonly applicationsRepository: ApplicationsRepository,
+    private readonly tokensBlackListsRepository: TokensBlackListsRepository,
   ) {}
 
   async canActivate(context: ExecutionContext) {
@@ -34,6 +36,14 @@ export class AuthGuard implements CanActivate {
 
     if (type !== 'Bearer' || !token)
       throw new UnauthorizedException('UNAUTHORIZED');
+    const isBlackListed = await this.tokensBlackListsRepository.findOne({
+      token,
+    });
+
+    console.log('isBlackListed', isBlackListed);
+    if (isBlackListed) {
+      throw new UnauthorizedException('UNAUTHORIZED');
+    }
 
     const payload = this.authService.validateToken(token);
 

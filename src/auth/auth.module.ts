@@ -7,9 +7,13 @@ import { ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from '@/helpers/guards/auth.guard';
 import { ApplicationsModule } from '@/applications/applications.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { TokenBlackList } from '@/tokens/entities/token.entity';
+import { TokensBlackListsRepository } from '@/tokens/tokens.repository';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([TokenBlackList]),
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
@@ -25,6 +29,7 @@ import { ApplicationsModule } from '@/applications/applications.module';
   controllers: [AuthController],
   providers: [
     AuthService,
+    TokensBlackListsRepository,
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
