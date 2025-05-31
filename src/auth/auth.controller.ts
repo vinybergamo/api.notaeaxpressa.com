@@ -122,7 +122,6 @@ export class AuthController {
           description: 'Access token to invalidate',
           schema: {
             type: 'string',
-            example: 'your-access-token',
           },
         },
       ],

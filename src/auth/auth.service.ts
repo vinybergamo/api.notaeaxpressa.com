@@ -93,6 +93,7 @@ export class AuthService {
 
     const blackListed = await this.tokensBlackListsRepository.create({
       token,
+      reason: 'LOGOUT',
     });
 
     res.clearCookie('access_token', {
