@@ -167,6 +167,7 @@ export class SubscriptionsService {
       additionalFee: plan.fee,
       currency: plan.currency,
       methods: plan.paymentMethods,
+      tags: plan.tags,
       correlationID,
       customer,
       subscription,

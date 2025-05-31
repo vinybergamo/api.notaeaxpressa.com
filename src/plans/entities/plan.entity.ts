@@ -34,6 +34,9 @@ export class Plan extends BaseSchema {
   trialDays: number;
 
   @Column({ type: 'text', array: true, default: [] })
+  tags: string[];
+
+  @Column({ type: 'text', array: true, default: [] })
   paymentMethods: PaymentMethodsEnum[];
 
   @Column({ default: false })
