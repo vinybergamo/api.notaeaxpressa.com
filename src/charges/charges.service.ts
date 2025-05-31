@@ -48,6 +48,19 @@ export class ChargesService {
     );
   }
 
+  async getPublicCharge(uuid: string) {
+    const charge = await this.chargesRepository.findOneOrFail(
+      {
+        uuid,
+      },
+      {
+        relations: ['customer', 'subscription', 'user', 'subscription.plan'],
+      },
+    );
+
+    return charge;
+  }
+
   async createOneStep(
     user: UserRequest,
     createChargeDto: CreateOneStepChargeDto,

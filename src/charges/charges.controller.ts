@@ -50,6 +50,47 @@ export class ChargesController {
   }
 
   @Endpoint({
+    method: 'GET',
+    path: ':uuid/public',
+    isPublic: true,
+    documentation: {
+      summary: 'Get public charge by UUID',
+      description:
+        'Retrieve a charge by its UUID. This endpoint is public and does not require authentication.',
+      params: [
+        {
+          name: 'uuid',
+          required: true,
+          description: 'UUID of the charge to retrieve',
+          schema: {
+            type: 'string',
+            format: 'uuid',
+            example: '550e8400-e29b-41d4-a716-446655440000',
+          },
+        },
+      ],
+      responses: {
+        200: {
+          description: 'Charge retrieved successfully',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ChargeEntity',
+              },
+            },
+          },
+        },
+        404: {
+          description: 'Charge not found',
+        },
+      },
+    },
+  })
+  getPublicCharge(@Param('uuid') uuid: string) {
+    return this.chargesService.getPublicCharge(uuid);
+  }
+
+  @Endpoint({
     method: 'POST',
     path: 'one-step',
     documentation: {
