@@ -172,7 +172,16 @@ export class Charge extends BaseSchema {
   url?: string;
 
   @ApiProperty({
-    description: 'Timestamp when the charge was created',
+    description: 'Tags associated with the charge',
+    type: [String],
+    example: ['service', 'payment'],
+    required: false,
+  })
+  @Column({ type: 'text', array: true, default: [] })
+  tags: string[];
+
+  @ApiProperty({
+    description: 'Expires in seconds, if applicable',
     type: 'number',
     example: 1633072800,
     required: false,
