@@ -19,6 +19,7 @@ async function bootstrap() {
   const prefix = config.get('APP_PREFIX', 'api');
   const reflector = app.get(Reflector);
   const appUrl = config.get<string | undefined>('APP_URL')?.split(/[,;]/);
+  const env = config.get('NODE_ENV', 'development');
 
   app.use(cookieParser());
   app.enableCors();
@@ -112,6 +113,12 @@ async function bootstrap() {
 
   await app.listen(port, () => {
     logger.log(`Server listening on port ${port}`);
+
+    if (env === 'development') {
+      logger.warn(
+        `Running in development mode. Make sure to set NODE_ENV to production in production environments.`,
+      );
+    }
   });
 }
 bootstrap();
