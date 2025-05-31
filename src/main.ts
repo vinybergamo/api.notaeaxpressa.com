@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { HttpExceptionFilter } from './helpers/exceptions/http-exception-filter.exception';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -19,6 +20,7 @@ async function bootstrap() {
   const reflector = app.get(Reflector);
   const appUrl = config.get<string | undefined>('APP_URL')?.split(/[,;]/);
 
+  app.use(cookieParser());
   app.enableCors();
   app.useGlobalFilters(new HttpExceptionFilter());
   app.setGlobalPrefix(prefix);
@@ -92,6 +94,12 @@ async function bootstrap() {
       in: 'header',
       bearerFormat: 'JWT',
       'x-tokenName': 'Authorization',
+    })
+    .addCookieAuth('access_token', {
+      type: 'apiKey',
+      in: 'cookie',
+      name: 'access_token',
+      description: 'Access token for authentication',
     });
 
   const documentConfig = documentBuilder.build();

@@ -32,10 +32,20 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const headers = request.headers;
     const authorization = headers?.authorization;
-    const [type, token] = authorization?.split(' ') || [];
+    const cookies = request.cookies;
+    const cookieToken = cookies?.access_token || cookies?.token;
+    const [type, headerToken] = authorization?.split(' ') || [];
+    const token = headerToken || cookieToken;
+    const isCookie = !!cookieToken;
 
-    if (type !== 'Bearer' || !token)
+    if (!isCookie && type && type.toLowerCase() !== 'bearer') {
       throw new UnauthorizedException('UNAUTHORIZED');
+    }
+
+    if (!token) {
+      throw new UnauthorizedException('UNAUTHORIZED');
+    }
+
     const isBlackListed = await this.tokensBlackListsRepository.findOne({
       token,
     });

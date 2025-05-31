@@ -11,6 +11,8 @@ import ms from 'ms';
 import { UsersRepository } from 'src/users/users.repository';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { Request, Response } from 'express';
+import { TokensBlackListsRepository } from '@/tokens/tokens.repository';
 
 @Injectable()
 export class AuthService {
@@ -18,9 +20,10 @@ export class AuthService {
     private readonly usersRepository: UsersRepository,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly tokensBlackListsRepository: TokensBlackListsRepository,
   ) {}
 
-  async register(registerDto: RegisterDto) {
+  async register(registerDto: RegisterDto, res: Response) {
     const exists = await this.usersRepository.findByEmail(registerDto.email);
 
     if (exists) {
@@ -32,13 +35,22 @@ export class AuthService {
 
     const user = await this.usersRepository.create(registerDto);
 
+    const token = this.generateToken(user);
+
+    res.cookie('access_token', token.value, {
+      httpOnly: true,
+      secure: this.configService.get('NODE_ENV') === 'production',
+      sameSite: 'strict',
+      maxAge: token.expiresIn,
+    });
+
     return {
       user,
-      token: this.generateToken(user),
+      token,
     };
   }
 
-  async login(loginDto: LoginDto) {
+  async login(loginDto: LoginDto, res: Response) {
     const user = await this.usersRepository.findByEmail(loginDto.email);
 
     if (!user) {
@@ -54,10 +66,42 @@ export class AuthService {
       throw new UnauthorizedException('INVALID_CREDENTIALS');
     }
 
+    const token = this.generateToken(user);
+
+    res.cookie('access_token', token.value, {
+      httpOnly: true,
+      secure: this.configService.get('NODE_ENV') === 'production',
+      sameSite: 'strict',
+      maxAge: token.expiresIn,
+    });
+
     return {
       user,
-      token: this.generateToken(user),
+      token,
     };
+  }
+
+  async logout(res: Response, req: Request, accessToken?: string) {
+    const token =
+      accessToken ||
+      req.cookies.access_token ||
+      req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+      throw new BadRequestException('TOKEN_REQUIRED', 'Token is required');
+    }
+
+    const blackListed = await this.tokensBlackListsRepository.create({
+      token,
+    });
+
+    res.clearCookie('access_token', {
+      httpOnly: true,
+      secure: this.configService.get('NODE_ENV') === 'production',
+      sameSite: 'strict',
+    });
+
+    return blackListed;
   }
 
   validateToken(token: string) {
