@@ -16,6 +16,9 @@ export class Subscription extends BaseSchema {
   @Column()
   nextBillingDate: Date;
 
+  @Column({ nullable: true })
+  lastBillingDate: Date;
+
   @Column({ default: 'ACTIVE' })
   status: string;
 

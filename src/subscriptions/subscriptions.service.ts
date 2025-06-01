@@ -155,6 +155,7 @@ export class SubscriptionsService {
 
     await this.subscriptionsRepository.update(subscription.id, {
       nextBillingDate,
+      lastBillingDate: now,
     });
 
     const chargesCount = await this.chargesRepository.count({
