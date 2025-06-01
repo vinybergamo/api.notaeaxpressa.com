@@ -112,6 +112,7 @@ async function bootstrap() {
   });
 
   await app.listen(port, () => {
+    logger.debug(`NODE_ENV - ${env}`);
     logger.log(`Server listening on port ${port}`);
 
     if (env === 'development') {
