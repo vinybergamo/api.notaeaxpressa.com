@@ -31,7 +31,7 @@ export class ReportsService {
       }
 
       acc[status].count += 1;
-      acc[status].totalAmount += math.number(charge.amount);
+      acc[status].totalAmount += math.number(charge.totalAmount);
       acc[status].totalFee += math.number(charge.fee ?? 0);
       acc[status].totalLiqAmount += math.number(charge.liqAmount ?? 0);
       if (includeCharges) {
