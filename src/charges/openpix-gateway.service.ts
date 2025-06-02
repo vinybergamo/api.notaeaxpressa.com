@@ -140,31 +140,41 @@ export class OpenPixGatewayService implements GatewayFactory {
 
   @OnEvent('openpix.charges.paid', { async: true })
   async onChargePaid(payload: any): Promise<void> {
-    const transaction = await this.openPixService.transaction.get(
-      payload.transactionID,
-    );
+    console.log(payload);
+    try {
+      const transactions = await this.openPixService.transaction.list({
+        charge: payload.identifier,
+      });
+      const transaction = transactions.transactions.find(
+        (t) =>
+          t.charge?.identifier === payload.identifier &&
+          t.charge.status === 'COMPLETED',
+      );
 
-    const payment = await this.openPixService.charge.get(payload.identifier);
+      const payment = await this.openPixService.charge.get(payload.identifier);
 
-    const charge = await this.chargesRepository.findOne({
-      correlationID: payload.correlationID,
-    });
+      const charge = await this.chargesRepository.findOne({
+        correlationID: payload.correlationID,
+      });
 
-    if (!charge) {
-      return;
+      if (!charge) {
+        return;
+      }
+
+      if (charge.status === 'COMPLETED') {
+        return;
+      }
+
+      const updatedCharge = await this.chargesRepository.update(charge.id, {
+        pix: payment?.paymentMethods?.pix,
+        status: 'COMPLETED',
+        paidAt: new Date(transaction.charge.paidAt),
+        metadata: transaction || payment,
+      });
+
+      this.eventEmitter.emit('charges.completed', updatedCharge);
+    } catch (error) {
+      console.error('Error processing charge paid event:', error);
     }
-
-    if (charge.status === 'COMPLETED') {
-      return;
-    }
-
-    const updatedCharge = await this.chargesRepository.update(charge.id, {
-      pix: payment?.paymentMethods?.pix,
-      status: 'COMPLETED',
-      paidAt: new Date(transaction.charge.paidAt),
-      metadata: transaction,
-    });
-
-    this.eventEmitter.emit('charges.completed', updatedCharge);
   }
 }
