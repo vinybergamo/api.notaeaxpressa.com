@@ -52,14 +52,17 @@ export class OpenPixGatewayService implements GatewayFactory {
           charge.id,
           {
             gateway: payChargeDto.gateway,
-            expiresIn: existsPaymet.expiresIn,
             gatewayChargeID: existsPaymet.transactionID,
-            expiresAt: existsPaymet.expiresDate,
             correlationID: charge.correlationID || correlationID,
             fee: existsPaymet.fee,
             url: existsPaymet.paymentLinkUrl,
             paymentMethod: 'PIX',
-            pix: existsPaymet?.paymentMethods?.pix,
+            pix: {
+              ...existsPaymet?.paymentMethods?.pix,
+              key: existsPaymet?.pixKey,
+              expiresAt: new Date(existsPaymet.expiresDate),
+              expiresIn: existsPaymet.expiresIn,
+            },
             metadata: existsPaymet,
           },
           {
@@ -84,13 +87,17 @@ export class OpenPixGatewayService implements GatewayFactory {
           charge.id,
           {
             gateway: payChargeDto.gateway,
-            expiresIn: updatedPayment.expiresIn,
             gatewayChargeID: updatedPayment.transactionID,
             correlationID: charge.correlationID || correlationID,
             fee: updatedPayment.fee,
             url: updatedPayment.paymentLinkUrl,
             paymentMethod: 'PIX',
-            pix: updatedPayment?.paymentMethods?.pix,
+            pix: {
+              ...updatedPayment?.paymentMethods?.pix,
+              key: updatedPayment?.pixKey,
+              expiresAt: new Date(updatedPayment.expiresDate),
+              expiresIn: updatedPayment.expiresIn,
+            },
             metadata: updatedPayment,
           },
           {
