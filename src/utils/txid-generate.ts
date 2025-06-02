@@ -8,6 +8,6 @@ export function txIdGenerate(prefix?: string, maxLength: number = 35): string {
   return result
     .trim()
     .replace(/[^a-zA-Z0-9]/g, '')
-    .padEnd(maxLength, '0')
+    .padEnd(maxLength, Math.round(Math.random() * 9).toString())
     .substring(0, maxLength);
 }
