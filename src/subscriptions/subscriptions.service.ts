@@ -149,9 +149,9 @@ export class SubscriptionsService {
     const user = subscription.user;
     const correlationID = txIdGenerate(
       `SUB${subscription.id}USER${user.id}CUS${customer.id}T${format(
-        new Date(),
-        'yyyyMMddHHmmssSSS',
-      )}${Math.random().toString(36).substring(2, 15)}`,
+        now,
+        'yyyyMMddHHmmssSSSS',
+      )}`,
     );
 
     await this.subscriptionsRepository.update(subscription.id, {

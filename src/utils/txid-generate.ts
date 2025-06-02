@@ -1,7 +1,10 @@
 export function txIdGenerate(prefix?: string, maxLength: number = 35): string {
-  const uuid = crypto.randomUUID();
-  const txId = uuid.replace(/-/g, '').trim();
-  const result = prefix ? `${prefix}UUID${txId}` : txId;
+  const txId = Math.random()
+    .toString(36)
+    .substring(2)
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '');
+  const result = prefix ? `${prefix}${txId}` : txId;
   return result
     .trim()
     .replace(/[^a-zA-Z0-9]/g, '')
