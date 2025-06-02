@@ -80,6 +80,7 @@ export class SubscriptionsService {
           days: plan.trialDays || 0,
         },
       ),
+      isTrial: !!plan.trialDays && plan.trialDays > 0,
       index: subscriptionsCount + 1,
       startDate: now,
       status: 'ACTIVE',
@@ -156,6 +157,7 @@ export class SubscriptionsService {
     await this.subscriptionsRepository.update(subscription.id, {
       nextBillingDate,
       lastBillingDate: now,
+      isTrial: false,
     });
 
     const chargesCount = await this.chargesRepository.count({

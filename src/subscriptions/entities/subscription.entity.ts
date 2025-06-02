@@ -22,6 +22,9 @@ export class Subscription extends BaseSchema {
   @Column({ default: 'ACTIVE' })
   status: string;
 
+  @Column({ default: false })
+  isTrial: boolean;
+
   @Column({ nullable: true })
   endDate: Date;
 
