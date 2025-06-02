@@ -94,10 +94,11 @@ export class User extends BaseSchema {
   })
   applications: Application[];
 
-  hashPassword() {
+  hashPassword(password?: string) {
     const salt = genSaltSync(10);
-    const hash = hashSync(this.password, salt);
+    const hash = hashSync(password || this.password, salt);
     this.password = hash;
+    return this.password;
   }
 
   passwordMatch(password: string): boolean {

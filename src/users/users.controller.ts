@@ -1,10 +1,11 @@
-import { Controller } from '@nestjs/common';
+import { Body, Controller } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Me } from '@/helpers/decorators/me.decorator';
 import { Endpoint } from '@/helpers/decorators/endpoint.decorator';
 import { HttpStatusCode } from 'axios';
 import { User } from './entities/user.entity';
 import { getSchemaPath } from '@nestjs/swagger';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Controller('users')
 export class UsersController {
@@ -54,5 +55,16 @@ export class UsersController {
   })
   async me(@Me() me: UserRequest) {
     return this.usersService.me(me.id);
+  }
+
+  @Endpoint({
+    method: 'PATCH',
+    path: 'me/password',
+  })
+  async changePassword(
+    @Me() me: UserRequest,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
+    return this.usersService.changePassword(me, changePasswordDto);
   }
 }
