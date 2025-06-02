@@ -143,16 +143,16 @@ export class SubscriptionsService {
       return;
     }
 
-    const correlationID = txIdGenerate(
-      `SUB${subscription.id}USER${subscription.user.id}T${format(
-        new Date(),
-        'yyyyMMddHHmmssSSS',
-      )}`,
-    );
     const nextBillingDate = this.getNextBillingDate(subscription);
     const plan = subscription.plan;
     const customer = subscription.customer;
     const user = subscription.user;
+    const correlationID = txIdGenerate(
+      `SUB${subscription.id}USER${user.id}CUS${customer.id}T${format(
+        new Date(),
+        'yyyyMMddHHmmssSSS',
+      )}${Math.random().toString(36).substring(2, 15)}`,
+    );
 
     await this.subscriptionsRepository.update(subscription.id, {
       nextBillingDate,

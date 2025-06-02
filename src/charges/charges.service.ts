@@ -98,11 +98,13 @@ export class ChargesService {
       );
     }
 
+    const customerId = customer ? `CUS${customer.id}` : '';
+
     const charge = await this.chargesRepository.create({
       ...createChargeDto,
       index: charges.length + 1,
       correlationID: txIdGenerate(
-        `USER${user.id}T${format(new Date(), 'yyyyMMddHHmmssSSS')}`,
+        `USER${user.id}${customerId}T${format(new Date(), 'yyyyMMddHHmmssSSS')}`,
       ),
       methods: [createChargeDto.paymentMethod],
       customer,
