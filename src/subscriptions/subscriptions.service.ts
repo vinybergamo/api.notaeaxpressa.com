@@ -150,7 +150,7 @@ export class SubscriptionsService {
     const correlationID = txIdGenerate(
       `SUB${subscription.id}USER${user.id}CUS${customer.id}T${format(
         now,
-        'yyyyMMddHHmmssSSSS',
+        'yyyyMMddHHmmssSSS',
       )}`,
     );
 
