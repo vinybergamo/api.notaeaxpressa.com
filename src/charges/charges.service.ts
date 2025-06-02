@@ -13,6 +13,7 @@ import { ManualGatewayService } from './manual-gateway.service';
 import { PaginateQuery } from 'nestjs-paginate';
 import { PayChargeDto } from './dto/pay-charge.dto';
 import { txIdGenerate } from '@/utils/txid-generate';
+import { isUUID } from 'class-validator';
 
 @Injectable()
 export class ChargesService {
@@ -49,6 +50,15 @@ export class ChargesService {
   }
 
   async getPublicCharge(uuid: string) {
+    const isValidUUID = isUUID(uuid);
+
+    if (!isValidUUID) {
+      throw new BadRequestException(
+        'INVALID_UUID',
+        'The provided UUID is not valid.',
+      );
+    }
+
     const charge = await this.chargesRepository.findOneOrFail(
       {
         uuid,
