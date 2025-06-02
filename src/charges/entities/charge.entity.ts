@@ -18,6 +18,9 @@ interface Pix {
   transactionID: string;
   identifier: string;
   qrCodeImage: string;
+  key?: string;
+  expiresIn?: number;
+  expiresAt?: Date;
 }
 
 @ApiSchema({

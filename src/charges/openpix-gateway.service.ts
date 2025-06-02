@@ -110,14 +110,17 @@ export class OpenPixGatewayService implements GatewayFactory {
       charge.id,
       {
         gateway: payChargeDto.gateway,
-        expiresIn: payment.expiresIn,
         gatewayChargeID: payment.transactionID,
-        expiresAt: payment.expiresDate,
         correlationID: charge.correlationID || correlationID,
         fee: payment.fee,
         url: payment.paymentLinkUrl,
         paymentMethod: 'PIX',
-        pix: payment?.paymentMethods?.pix,
+        pix: {
+          ...payment?.paymentMethods?.pix,
+          key: payment?.pixKey,
+          expiresAt: new Date(payment.expiresDate),
+          expiresIn: payment.expiresIn,
+        },
         metadata: payment,
       },
       {
