@@ -13,10 +13,15 @@ export class ReportsService {
     chargesReportDto: GetChargesReportDto,
   ) {
     const { start, end, includeCharges } = chargesReportDto;
-    const charges = await this.chargesRepository.find({
-      user: { id: user.id },
-      createdAt: Between(start, end ? end : new Date()),
-    });
+    const charges = await this.chargesRepository.find(
+      {
+        user: { id: user.id },
+        createdAt: Between(start, end ? end : new Date()),
+      },
+      {
+        order: { createdAt: 'DESC' },
+      },
+    );
 
     const groupedByStatus = charges.reduce((acc, charge) => {
       const status = charge.status.toLowerCase();
