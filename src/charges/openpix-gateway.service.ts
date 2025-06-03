@@ -140,7 +140,6 @@ export class OpenPixGatewayService implements GatewayFactory {
 
   @OnEvent('openpix.charges.paid', { async: true })
   async onChargePaid(payload: any): Promise<void> {
-    console.log(payload);
     try {
       const transactions = await this.openPixService.transaction.list({
         charge: payload.identifier,
