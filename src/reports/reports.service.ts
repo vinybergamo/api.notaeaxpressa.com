@@ -61,6 +61,15 @@ export class ReportsService {
         0,
       ),
       byStatus: groupedByStatus,
+      atp: {
+        total: math.number(
+          charges.reduce((sum, charge) => sum + charge.amount, 0),
+        ),
+        average: math.number(
+          charges.reduce((sum, charge) => sum + charge.amount, 0) /
+            charges.length,
+        ),
+      },
       period: {
         start: start,
         end: end || new Date(),
