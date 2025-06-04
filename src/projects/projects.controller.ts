@@ -59,7 +59,7 @@ export class ProjectsController {
                 type: 'object',
                 properties: {
                   project: {
-                    $ref: '#/components/schemas/ProjectSchema',
+                    $ref: '#/components/schemas/ProjectEntity',
                   },
                 },
               },
