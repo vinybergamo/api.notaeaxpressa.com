@@ -1,0 +1,2190 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/v1/users/me": {
+      "get": {
+        "description": "Get current user information",
+        "operationId": "UsersController_me_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Current user information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserEntity"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get current user",
+        "tags": ["Users"]
+      }
+    },
+    "/v1/users/me/password": {
+      "patch": {
+        "operationId": "UsersController_changePassword_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "number",
+                      "default": 401
+                    },
+                    "message": {
+                      "type": "string",
+                      "default": "UNAUTHORIZED"
+                    },
+                    "error": {
+                      "type": "string",
+                      "default": "Unauthorized"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": ["Users"]
+      }
+    },
+    "/v1/auth/register": {
+      "post": {
+        "description": "Register a new user",
+        "operationId": "AuthController_register_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/UserEntity"
+                    },
+                    "token": {
+                      "$ref": "#/components/schemas/Token"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Register",
+        "tags": ["Auth"]
+      }
+    },
+    "/v1/auth/login": {
+      "post": {
+        "description": "Login to the application",
+        "operationId": "AuthController_login_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/UserEntity"
+                    },
+                    "token": {
+                      "$ref": "#/components/schemas/Token"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Login",
+        "tags": ["Auth"]
+      }
+    },
+    "/v1/auth/logout": {
+      "post": {
+        "description": "Logout from the application",
+        "operationId": "AuthController_logout_v1",
+        "parameters": [
+          {
+            "name": "accessToken",
+            "required": false,
+            "in": "query",
+            "description": "Access token to invalidate",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Logout successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Logout successful"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Logout",
+        "tags": ["Auth"]
+      }
+    },
+    "/v1/applications": {
+      "post": {
+        "operationId": "ApplicationsController_createApplication_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateApplicationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "number",
+                      "default": 401
+                    },
+                    "message": {
+                      "type": "string",
+                      "default": "UNAUTHORIZED"
+                    },
+                    "error": {
+                      "type": "string",
+                      "default": "Unauthorized"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": ["Applications"]
+      }
+    },
+    "/v1/applications/{id}/regenerate-token": {
+      "patch": {
+        "operationId": "ApplicationsController_regenerateToken_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegenerateTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "number",
+                      "default": 401
+                    },
+                    "message": {
+                      "type": "string",
+                      "default": "UNAUTHORIZED"
+                    },
+                    "error": {
+                      "type": "string",
+                      "default": "Unauthorized"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": ["Applications"]
+      }
+    },
+    "/v1/customers": {
+      "get": {
+        "operationId": "CustomersController_list_v1",
+        "parameters": [
+          {
+            "name": "relations",
+            "required": false,
+            "in": "query",
+            "description": "Semicolon-Separated list of relations to include in the response",
+            "schema": {
+              "type": "string",
+              "example": "customer;subscription"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of customers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CustomerEntity"
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "itemsPerPage": {
+                          "type": "number",
+                          "description": "Number of items per page",
+                          "example": 10,
+                          "readOnly": true
+                        },
+                        "totalItems": {
+                          "type": "number",
+                          "description": "Total number of items",
+                          "example": 100,
+                          "readOnly": true
+                        },
+                        "currentPage": {
+                          "type": "number",
+                          "description": "Current page number",
+                          "example": 1,
+                          "readOnly": true
+                        },
+                        "totalPages": {
+                          "type": "number",
+                          "description": "Total number of pages",
+                          "example": 10,
+                          "readOnly": true
+                        },
+                        "sortBy": {
+                          "type": "array",
+                          "description": "Sorting criteria",
+                          "example": [["id", "DESC"]],
+                          "readOnly": true
+                        },
+                        "search": {
+                          "type": "string",
+                          "description": "Search query",
+                          "example": "Jane",
+                          "readOnly": true
+                        },
+                        "filter": {
+                          "type": "object",
+                          "description": "Filter criteria",
+                          "example": {
+                            "tags": ["VIP"]
+                          },
+                          "readOnly": true
+                        }
+                      }
+                    },
+                    "links": {
+                      "properties": {
+                        "first": {
+                          "type": "string",
+                          "description": "Link to the first page",
+                          "example": "/api/v1/customers?page=1"
+                        },
+                        "previous": {
+                          "type": "string",
+                          "description": "Link to the previous page",
+                          "example": "/api/v1/customers?page=1"
+                        },
+                        "current": {
+                          "type": "string",
+                          "description": "Link to the current page",
+                          "example": "/api/v1/customers?page=1"
+                        },
+                        "next": {
+                          "type": "string",
+                          "description": "Link to the next page",
+                          "example": "/api/v1/customers?page=2"
+                        },
+                        "last": {
+                          "type": "string",
+                          "description": "Link to the last page",
+                          "example": "/api/v1/customers?page=10"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all customers",
+        "tags": ["Customers"]
+      },
+      "post": {
+        "operationId": "CustomersController_create_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCustomerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "number",
+                      "default": 401
+                    },
+                    "message": {
+                      "type": "string",
+                      "default": "UNAUTHORIZED"
+                    },
+                    "error": {
+                      "type": "string",
+                      "default": "Unauthorized"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": ["Customers"]
+      }
+    },
+    "/v1/customers/{id}": {
+      "put": {
+        "operationId": "CustomersController_update_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCustomerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Customer updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerEntity"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a customer",
+        "tags": ["Customers"]
+      },
+      "delete": {
+        "operationId": "CustomersController_delete_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Customer deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Customer deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a customer",
+        "tags": ["Customers"]
+      }
+    },
+    "/v1/charges": {
+      "get": {
+        "description": "Retrieve a paginated list of all charges associated with the authenticated user.",
+        "operationId": "ChargesController_list_v1",
+        "parameters": [
+          {
+            "name": "relations",
+            "required": false,
+            "in": "query",
+            "description": "Semicolon-Separated list of relations to include in the response",
+            "schema": {
+              "type": "string",
+              "example": "customer;subscription"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of charges",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ChargeEntity"
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "itemsPerPage": {
+                          "type": "number",
+                          "description": "Number of items per page",
+                          "example": 10,
+                          "readOnly": true
+                        },
+                        "totalItems": {
+                          "type": "number",
+                          "description": "Total number of items",
+                          "example": 100,
+                          "readOnly": true
+                        },
+                        "currentPage": {
+                          "type": "number",
+                          "description": "Current page number",
+                          "example": 1,
+                          "readOnly": true
+                        },
+                        "totalPages": {
+                          "type": "number",
+                          "description": "Total number of pages",
+                          "example": 10,
+                          "readOnly": true
+                        },
+                        "sortBy": {
+                          "type": "array",
+                          "description": "Sorting criteria",
+                          "example": [["id", "DESC"]],
+                          "readOnly": true
+                        },
+                        "search": {
+                          "type": "string",
+                          "description": "Search query",
+                          "example": "Jane",
+                          "readOnly": true
+                        },
+                        "filter": {
+                          "type": "object",
+                          "description": "Filter criteria",
+                          "example": {
+                            "tags": ["VIP"]
+                          },
+                          "readOnly": true
+                        }
+                      }
+                    },
+                    "links": {
+                      "properties": {
+                        "first": {
+                          "type": "string",
+                          "description": "Link to the first page",
+                          "example": "/api/v1/charges?page=1"
+                        },
+                        "previous": {
+                          "type": "string",
+                          "description": "Link to the previous page",
+                          "example": "/api/v1/charges?page=1"
+                        },
+                        "current": {
+                          "type": "string",
+                          "description": "Link to the current page",
+                          "example": "/api/v1/charges?page=1"
+                        },
+                        "next": {
+                          "type": "string",
+                          "description": "Link to the next page",
+                          "example": "/api/v1/charges?page=2"
+                        },
+                        "last": {
+                          "type": "string",
+                          "description": "Link to the last page",
+                          "example": "/api/v1/charges?page=10"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all charges",
+        "tags": ["Charges"]
+      }
+    },
+    "/v1/charges/{uuid}/public": {
+      "get": {
+        "description": "Retrieve a charge by its UUID. This endpoint is public and does not require authentication.",
+        "operationId": "ChargesController_getPublicCharge_v1",
+        "parameters": [
+          {
+            "name": "uuid",
+            "required": true,
+            "in": "path",
+            "description": "UUID of the charge to retrieve",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "550e8400-e29b-41d4-a716-446655440000"
+            }
+          }
+        ],
+        "params": [
+          {
+            "name": "uuid",
+            "required": true,
+            "description": "UUID of the charge to retrieve",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "550e8400-e29b-41d4-a716-446655440000"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Charge retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChargeEntity"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Charge not found"
+          }
+        },
+        "summary": "Get public charge by UUID",
+        "tags": ["Charges"]
+      }
+    },
+    "/v1/charges/one-step": {
+      "post": {
+        "operationId": "ChargesController_create_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOneStepChargeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Charge created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChargeEntity"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a one-step charge",
+        "tags": ["Charges"]
+      }
+    },
+    "/v1/charges/{chargeId}/pay": {
+      "post": {
+        "description": "Process a payment for a specific charge using the specified gateway.",
+        "operationId": "ChargesController_pay_v1",
+        "parameters": [
+          {
+            "name": "chargeId",
+            "required": true,
+            "in": "path",
+            "description": "ID of the charge to pay",
+            "schema": {
+              "type": "string",
+              "format": "uuid or integer",
+              "examples": {
+                "uuid": {
+                  "value": "550e8400-e29b-41d4-a716-446655440000",
+                  "description": "Example UUID charge ID"
+                },
+                "integer": {
+                  "value": "123456",
+                  "description": "Example integer charge ID"
+                }
+              }
+            }
+          }
+        ],
+        "params": [
+          {
+            "name": "chargeId",
+            "required": true,
+            "description": "ID of the charge to pay",
+            "schema": {
+              "type": "string",
+              "format": "uuid or integer",
+              "examples": {
+                "uuid": {
+                  "value": "550e8400-e29b-41d4-a716-446655440000",
+                  "description": "Example UUID charge ID"
+                },
+                "integer": {
+                  "value": "123456",
+                  "description": "Example integer charge ID"
+                }
+              }
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PayChargeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Charge paid successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChargeEntity"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid payment method or gateway"
+          }
+        },
+        "summary": "Pay a charge",
+        "tags": ["Charges"]
+      }
+    },
+    "/v1/webhooks/charges/{gateway}": {
+      "post": {
+        "description": "Endpoint to receive and process charge webhooks from various payment gateways.",
+        "operationId": "WebhooksController_handleChargeWebhook_v1",
+        "parameters": [
+          {
+            "name": "gateway",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook received and processed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "gateway": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Handle charge webhook from payment gateway",
+        "tags": ["Webhooks"]
+      }
+    },
+    "/v1/projects": {
+      "get": {
+        "operationId": "ProjectsController_list_v1",
+        "parameters": [
+          {
+            "name": "relations",
+            "required": false,
+            "in": "query",
+            "description": "Semicolon-Separated list of relations to include in the response",
+            "schema": {
+              "type": "string",
+              "example": "customer;user"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of projects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ProjectEntity"
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "itemsPerPage": {
+                          "type": "number",
+                          "description": "Number of items per page",
+                          "example": 10,
+                          "readOnly": true
+                        },
+                        "totalItems": {
+                          "type": "number",
+                          "description": "Total number of items",
+                          "example": 100,
+                          "readOnly": true
+                        },
+                        "currentPage": {
+                          "type": "number",
+                          "description": "Current page number",
+                          "example": 1,
+                          "readOnly": true
+                        },
+                        "totalPages": {
+                          "type": "number",
+                          "description": "Total number of pages",
+                          "example": 10,
+                          "readOnly": true
+                        },
+                        "sortBy": {
+                          "type": "array",
+                          "description": "Sorting criteria",
+                          "example": [["id", "DESC"]],
+                          "readOnly": true
+                        },
+                        "search": {
+                          "type": "string",
+                          "description": "Search query",
+                          "example": "Jane",
+                          "readOnly": true
+                        },
+                        "filter": {
+                          "type": "object",
+                          "description": "Filter criteria",
+                          "example": {
+                            "tags": ["VIP"]
+                          },
+                          "readOnly": true
+                        }
+                      }
+                    },
+                    "links": {
+                      "properties": {
+                        "first": {
+                          "type": "string",
+                          "description": "Link to the first page",
+                          "example": "/api/v1/projects?page=1"
+                        },
+                        "previous": {
+                          "type": "string",
+                          "description": "Link to the previous page",
+                          "example": "/api/v1/projects?page=1"
+                        },
+                        "current": {
+                          "type": "string",
+                          "description": "Link to the current page",
+                          "example": "/api/v1/projects?page=1"
+                        },
+                        "next": {
+                          "type": "string",
+                          "description": "Link to the next page",
+                          "example": "/api/v1/projects?page=2"
+                        },
+                        "last": {
+                          "type": "string",
+                          "description": "Link to the last page",
+                          "example": "/api/v1/projects?page=10"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all projects",
+        "tags": ["Projects"]
+      },
+      "post": {
+        "operationId": "ProjectsController_create_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProjectDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Project created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "project": {
+                      "$ref": "#/components/schemas/ProjectEntity"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new project",
+        "tags": ["Projects"]
+      }
+    },
+    "/v1/plans": {
+      "post": {
+        "operationId": "PlansController_create_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePlanDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "number",
+                      "default": 401
+                    },
+                    "message": {
+                      "type": "string",
+                      "default": "UNAUTHORIZED"
+                    },
+                    "error": {
+                      "type": "string",
+                      "default": "Unauthorized"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": ["Plans"]
+      }
+    },
+    "/v1/subscriptions": {
+      "post": {
+        "operationId": "SubscriptionsController_create_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSubscriptionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "number",
+                      "default": 401
+                    },
+                    "message": {
+                      "type": "string",
+                      "default": "UNAUTHORIZED"
+                    },
+                    "error": {
+                      "type": "string",
+                      "default": "Unauthorized"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": ["Subscriptions"]
+      }
+    },
+    "/v1/reports/charges": {
+      "get": {
+        "operationId": "ReportsController_getChargesReport_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "number",
+                      "default": 401
+                    },
+                    "message": {
+                      "type": "string",
+                      "default": "UNAUTHORIZED"
+                    },
+                    "error": {
+                      "type": "string",
+                      "default": "Unauthorized"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": ["Reports"]
+      }
+    }
+  },
+  "info": {
+    "title": "NestJS API",
+    "description": "API documentation",
+    "version": "1.0",
+    "contact": {
+      "name": "Vinycios Cavalcante Bergamo",
+      "url": "vinybergamo.cmo",
+      "email": "contato@vinybergamo.com"
+    }
+  },
+  "tags": [],
+  "servers": [
+    {
+      "url": "http://localhost:3333",
+      "description": "Local server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT token",
+        "type": "http",
+        "name": "bearer",
+        "in": "header",
+        "x-tokenName": "Authorization"
+      },
+      "cookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "access_token",
+        "description": "Access token for authentication"
+      }
+    },
+    "schemas": {
+      "ChargeEntity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Unique identifier for the record",
+            "example": 1
+          },
+          "uuid": {
+            "type": "string",
+            "description": "UUID for the record",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the record was created",
+            "example": "2025-06-04T04:45:10.067Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the record was last updated",
+            "example": "2025-06-04T04:45:10.067Z"
+          },
+          "deletedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the record was deleted",
+            "example": "2025-06-04T04:45:10.067Z",
+            "default": null
+          },
+          "index": {
+            "type": "number"
+          },
+          "correlationID": {
+            "type": "string",
+            "description": "Unique identifier for the charge",
+            "example": "12345"
+          },
+          "gatewayChargeID": {
+            "type": "string",
+            "description": "Unique identifier for the charge in the payment gateway",
+            "example": "gw_12345"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Amount of the charge in cents",
+            "example": 1000
+          },
+          "liqAmount": {
+            "type": "number",
+            "description": "Total amount of the charge in cents, including fees",
+            "example": 1050
+          },
+          "totalAmount": {
+            "type": "number",
+            "description": "Total amount of the charge in cents, including fees and additional fees",
+            "example": 1100
+          },
+          "gateway": {
+            "type": "string",
+            "description": "Gateway used for the charge",
+            "example": "OPENPIX",
+            "enum": ["OPENPIX"]
+          },
+          "fee": {
+            "type": "number",
+            "description": "Fee associated with the charge in cents",
+            "example": 50,
+            "default": 0
+          },
+          "additionalFee": {
+            "type": "number",
+            "description": "Additional fee associated with the charge in cents",
+            "example": 100,
+            "default": 0
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the charge",
+            "example": "Payment for service rendered"
+          },
+          "status": {
+            "type": "string",
+            "description": "Status of the charge",
+            "example": "PENDING",
+            "enum": [
+              "PENDING",
+              "COMPLETED",
+              "FAILED",
+              "CANCELED",
+              "REFUNDED",
+              "EXPIRED",
+              "PROCESSING",
+              "REFUSED"
+            ],
+            "default": "PENDING"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency of the charge",
+            "example": "BRL",
+            "default": "BRL"
+          },
+          "methods": {
+            "type": "array",
+            "description": "List of payment methods available for the charge",
+            "example": ["CREDIT_CARD", "PIX", "BOLETO"],
+            "default": [],
+            "items": {
+              "type": "string",
+              "enum": ["PIX", "CREDIT_CARD"]
+            }
+          },
+          "paymentMethod": {
+            "type": "string",
+            "description": "Payment method used for the charge",
+            "example": "CREDIT_CARD"
+          },
+          "url": {
+            "type": "string",
+            "description": "URL for the charge, if applicable",
+            "example": "https://example.com/charge/12345"
+          },
+          "tags": {
+            "description": "Tags associated with the charge",
+            "example": ["service", "payment"],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "expiresIn": {
+            "type": "number",
+            "description": "Expires in seconds, if applicable",
+            "example": 1633072800
+          },
+          "expiresAt": {
+            "type": "string",
+            "description": "Timestamp when the charge expires, if applicable",
+            "format": "date-time"
+          },
+          "paidAt": {
+            "type": "string",
+            "description": "Timestamp when the charge was paid, if applicable",
+            "format": "date-time"
+          },
+          "pix": {
+            "description": "Pix payment details, if applicable",
+            "allOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "method": {
+                    "type": "string",
+                    "example": "PIX_COB"
+                  },
+                  "txId": {
+                    "type": "string",
+                    "example": "1234567890"
+                  },
+                  "value": {
+                    "type": "number",
+                    "example": 1000
+                  },
+                  "status": {
+                    "type": "string",
+                    "example": "COMPLETED"
+                  },
+                  "fee": {
+                    "type": "number",
+                    "example": 10
+                  },
+                  "brCode": {
+                    "type": "string",
+                    "example": "00020101021126640014BR.GOV.BCB.PIX0114e2eID1234567890123456789012345678905204000053039865404100000000000000000000000000006304A0B1"
+                  },
+                  "transactionID": {
+                    "type": "string",
+                    "example": "1234567890"
+                  },
+                  "identifier": {
+                    "type": "string",
+                    "example": "1234567890"
+                  },
+                  "qrCodeImage": {
+                    "type": "string",
+                    "example": "https://example.com/qr-code.png"
+                  }
+                }
+              }
+            ]
+          },
+          "customer": {
+            "description": "Customer associated with the charge",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CustomerEntity"
+              }
+            ]
+          }
+        },
+        "description": "Entity representing a charge in the system",
+        "required": [
+          "id",
+          "uuid",
+          "createdAt",
+          "updatedAt",
+          "deletedAt",
+          "index",
+          "amount",
+          "status",
+          "customer"
+        ]
+      },
+      "ProjectEntity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Unique identifier for the record",
+            "example": 1
+          },
+          "uuid": {
+            "type": "string",
+            "description": "UUID for the record",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the record was created",
+            "example": "2025-06-04T04:45:10.067Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the record was last updated",
+            "example": "2025-06-04T04:45:10.067Z"
+          },
+          "deletedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the record was deleted",
+            "example": "2025-06-04T04:45:10.067Z",
+            "default": null
+          },
+          "index": {
+            "type": "number",
+            "description": "Index of the project",
+            "example": 1,
+            "default": "Auto-generated"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the project",
+            "example": "Project Alpha"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the project",
+            "example": "This is a sample project description."
+          },
+          "status": {
+            "type": "string",
+            "description": "Status of the project",
+            "example": "ACTIVE",
+            "default": "ACTIVE"
+          },
+          "value": {
+            "type": "number",
+            "description": "Value of the project in cents",
+            "example": 1000
+          },
+          "logo": {
+            "type": "string",
+            "description": "Logo of the project",
+            "example": "https://example.com/logo.png"
+          },
+          "website": {
+            "type": "string",
+            "description": "Website of the project",
+            "example": "https://example.com"
+          },
+          "git": {
+            "type": "string",
+            "description": "GitHub repository of the project",
+            "example": "https://github.com/user/project.git"
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of the project",
+            "example": "WEB",
+            "default": "WEB"
+          },
+          "user": {
+            "description": "User associated with the project",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserEntity"
+              }
+            ]
+          },
+          "customer": {
+            "description": "Customer associated with the project",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CustomerEntity"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "uuid",
+          "createdAt",
+          "updatedAt",
+          "deletedAt",
+          "index",
+          "name"
+        ]
+      },
+      "Subscription": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Unique identifier for the record",
+            "example": 1
+          },
+          "uuid": {
+            "type": "string",
+            "description": "UUID for the record",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the record was created",
+            "example": "2025-06-04T04:45:10.067Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the record was last updated",
+            "example": "2025-06-04T04:45:10.067Z"
+          },
+          "deletedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the record was deleted",
+            "example": "2025-06-04T04:45:10.067Z",
+            "default": null
+          }
+        },
+        "required": ["id", "uuid", "createdAt", "updatedAt", "deletedAt"]
+      },
+      "UserEntity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Unique identifier for the record",
+            "example": 1
+          },
+          "uuid": {
+            "type": "string",
+            "description": "UUID for the record",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the record was created",
+            "example": "2025-06-04T04:45:10.067Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the record was last updated",
+            "example": "2025-06-04T04:45:10.067Z"
+          },
+          "deletedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the record was deleted",
+            "example": "2025-06-04T04:45:10.067Z",
+            "default": null
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the user",
+            "example": "John Doe"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email of the user",
+            "example": "john_doe@email.comm"
+          },
+          "avatar": {
+            "type": "string",
+            "description": "Avatar of the user",
+            "example": "https://example.com/avatar.jpg"
+          },
+          "customers": {
+            "description": "Customers associated with the user",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerEntity"
+            }
+          },
+          "charges": {
+            "description": "Charges associated with the user",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChargeEntity"
+            }
+          },
+          "projects": {
+            "description": "Projects associated with the user",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectEntity"
+            }
+          },
+          "subscriptions": {
+            "description": "Subscriptions associated with the user",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Subscription"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "uuid",
+          "createdAt",
+          "updatedAt",
+          "deletedAt",
+          "name",
+          "email",
+          "avatar",
+          "customers",
+          "charges",
+          "projects",
+          "subscriptions"
+        ]
+      },
+      "CustomerEntity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Unique identifier for the record",
+            "example": 1
+          },
+          "uuid": {
+            "type": "string",
+            "description": "UUID for the record",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the record was created",
+            "example": "2025-06-04T04:45:10.067Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the record was last updated",
+            "example": "2025-06-04T04:45:10.067Z"
+          },
+          "deletedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the record was deleted",
+            "example": "2025-06-04T04:45:10.067Z",
+            "default": null
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the customer",
+            "example": "Jane Doe"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email of the customer",
+            "example": "john_doe@email.com"
+          },
+          "document": {
+            "type": "string",
+            "description": "Document of the customer",
+            "example": "12345678909"
+          },
+          "documentType": {
+            "type": "string",
+            "description": "Type of the document",
+            "example": "BR:CPF"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Phone number of the customer",
+            "example": "5511912345678"
+          },
+          "countryCode": {
+            "type": "string",
+            "description": "Coutry Code of the customer phone number",
+            "example": "BR:+55"
+          },
+          "tags": {
+            "description": "Tags associated with the customer",
+            "example": ["VIP", "Newsletter"],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "avatar": {
+            "type": "string",
+            "description": "Avatar of the customer",
+            "example": "https://example.com/avatar.jpg"
+          },
+          "charges": {
+            "description": "Charges associated with the customer",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChargeEntity"
+            }
+          },
+          "user": {
+            "description": "User associated with the customer",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserEntity"
+              }
+            ]
+          },
+          "projects": {
+            "description": "Projects associated with the customer",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectEntity"
+            }
+          },
+          "subscriptions": {
+            "description": "Subscriptions associated with the customer",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Subscription"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "uuid",
+          "createdAt",
+          "updatedAt",
+          "deletedAt",
+          "name",
+          "email",
+          "document",
+          "documentType",
+          "phone",
+          "countryCode",
+          "tags",
+          "user"
+        ]
+      },
+      "ChangePasswordDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "Token": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Type of the token",
+            "default": "Bearer",
+            "example": "Bearer"
+          },
+          "value": {
+            "type": "string",
+            "description": "The token value",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Expiration date of the token",
+            "example": "2025-06-04T04:45:11.649Z"
+          },
+          "expiresIn": {
+            "type": "number",
+            "description": "Expiration time of the token in milliseconds",
+            "example": 3600000
+          },
+          "expiresInSeconds": {
+            "type": "number",
+            "description": "Expiration time of the token in seconds",
+            "example": 3600
+          },
+          "generatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date when the token was generated",
+            "example": "2025-06-04T04:45:11.649Z"
+          },
+          "generatedIn": {
+            "type": "number",
+            "description": "Time taken to generate the token in milliseconds",
+            "example": 1749012311649
+          }
+        },
+        "required": [
+          "type",
+          "value",
+          "expiresAt",
+          "expiresIn",
+          "expiresInSeconds",
+          "generatedAt",
+          "generatedIn"
+        ]
+      },
+      "RegisterDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the user",
+            "example": "John Doe"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email of the user",
+            "example": "john_doe@email.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "Password of the user",
+            "example": "password123"
+          }
+        },
+        "required": ["name", "email", "password"]
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email of the user",
+            "example": "john_doe@email.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "Password of the user",
+            "example": "password123"
+          }
+        },
+        "required": ["email", "password"]
+      },
+      "CreateApplicationDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "RegenerateTokenDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateCustomerDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the customer",
+            "example": "Jane Doe"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email of the customer",
+            "example": "john_doe@email.com"
+          },
+          "document": {
+            "type": "string",
+            "description": "Document of the customer",
+            "example": "12345678909"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Phone number of the customer",
+            "example": "5511912345678"
+          },
+          "tags": {
+            "description": "Tags associated with the customer",
+            "example": ["vip", "regular"],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["name", "email", "document"]
+      },
+      "UpdateCustomerDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the customer",
+            "example": "Jane Doe"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email of the customer",
+            "example": "john_doe@email.com"
+          },
+          "document": {
+            "type": "string",
+            "description": "Document of the customer",
+            "example": "12345678909"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Phone number of the customer",
+            "example": "5511912345678"
+          },
+          "tags": {
+            "description": "Tags associated with the customer",
+            "example": ["vip", "regular"],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CreditCardHolderDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the credit card holder",
+            "example": "John Doe"
+          },
+          "document": {
+            "type": "string",
+            "description": "Document type of the credit card holder",
+            "example": "12345678909"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Phone number of the credit card holder",
+            "example": "5511999999999"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email of the credit card holder",
+            "example": "john_doe@email.com"
+          }
+        },
+        "required": ["name", "document"]
+      },
+      "CreditCardDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Credit card token for the transaction",
+            "example": "1234567890abcdef"
+          },
+          "installments": {
+            "type": "number",
+            "description": "Number of installments for the payment",
+            "example": 3
+          },
+          "mask": {
+            "type": "string",
+            "description": "Mask of the credit card.",
+            "example": "1234********1234"
+          },
+          "reuseToken": {
+            "type": "boolean",
+            "description": "Indicates whether to reuse the token for future transactions",
+            "example": true
+          },
+          "holder": {
+            "description": "Credit card holder information",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CreditCardHolderDto"
+              }
+            ]
+          }
+        },
+        "required": ["token", "installments", "mask", "reuseToken", "holder"]
+      },
+      "CreateOneStepChargeDto": {
+        "type": "object",
+        "properties": {
+          "gateway": {
+            "type": "string",
+            "description": "Gateway to be used for the charge",
+            "example": "OPENPIX",
+            "enum": ["OPENPIX"]
+          },
+          "paymentMethod": {
+            "type": "string",
+            "description": "Payment method to be used for the charge",
+            "example": "PIX",
+            "enum": ["PIX", "CREDIT_CARD"]
+          },
+          "creditCard": {
+            "description": "Credit card details if payment method is CREDIT_CARD",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CreditCardDto"
+              }
+            ]
+          },
+          "customerId": {
+            "type": "string",
+            "description": "ID of the customer associated with the charge",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "additionalFee": {
+            "type": "number",
+            "description": "Additional fee for the charge in cents, must be a positive integer",
+            "example": 100
+          },
+          "amount": {
+            "type": "number",
+            "description": "Amount of the charge in cents, must be a positive integer",
+            "example": 5000
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the charge",
+            "example": "Payment for service XYZ"
+          },
+          "dueDate": {
+            "type": "string",
+            "description": "Due date for the charge in ISO format",
+            "example": "2023-10-31T23:59:59.999Z"
+          },
+          "expiresIn": {
+            "type": "number",
+            "description": "Expiration time for the charge in seconds",
+            "example": 3600
+          }
+        },
+        "required": ["gateway", "paymentMethod", "amount"]
+      },
+      "PayChargeDto": {
+        "type": "object",
+        "properties": {
+          "gateway": {
+            "type": "string",
+            "description": "Gateway to be used for the charge",
+            "example": "OPENPIX",
+            "enum": ["OPENPIX"]
+          },
+          "paymentMethod": {
+            "type": "string",
+            "description": "Payment method to be used for the charge",
+            "example": "PIX",
+            "enum": ["PIX", "CREDIT_CARD"]
+          },
+          "creditCard": {
+            "description": "Credit card details if payment method is CREDIT_CARD",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CreditCardDto"
+              }
+            ]
+          }
+        },
+        "required": ["gateway", "paymentMethod"]
+      },
+      "CreateProjectDto": {
+        "type": "object",
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "description": "Customer ID associated with the project",
+            "example": "1"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the project",
+            "example": "Project Alpha"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the project",
+            "example": "This is a sample project description."
+          },
+          "value": {
+            "type": "number",
+            "description": "Value of the project in cents",
+            "example": 1000
+          },
+          "logo": {
+            "type": "string",
+            "description": "Logo of the project",
+            "example": "https://example.com/logo.png"
+          },
+          "website": {
+            "type": "string",
+            "description": "Website of the project",
+            "example": "https://example.com"
+          },
+          "status": {
+            "type": "string",
+            "description": "Status of the project",
+            "example": "ACTIVE",
+            "default": "ACTIVE"
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of the project",
+            "example": "WEB",
+            "default": "WEB"
+          },
+          "git": {
+            "type": "string",
+            "description": "GitHub repository of the project",
+            "example": "https://github.com/user/project.git"
+          }
+        },
+        "required": ["name"]
+      },
+      "CreatePlanDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateSubscriptionDto": {
+        "type": "object",
+        "properties": {
+          "planId": {
+            "type": "string",
+            "description": "ID of the plan to subscribe to",
+            "example": "1"
+          },
+          "customerId": {
+            "type": "string",
+            "description": "ID of the customer subscribing to the plan",
+            "example": "1"
+          }
+        },
+        "required": ["planId", "customerId"]
+      }
+    }
+  }
+}

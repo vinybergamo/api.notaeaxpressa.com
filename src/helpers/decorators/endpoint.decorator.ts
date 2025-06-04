@@ -118,6 +118,7 @@ function createDocumentation(
 
     delete documentation.query;
     delete documentation.extraModels;
+    delete documentation.params;
     decorators.push(ApiOperation(documentation));
   }
 
