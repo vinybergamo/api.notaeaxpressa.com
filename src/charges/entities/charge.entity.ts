@@ -1,4 +1,11 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, ManyToOne } from 'typeorm';
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  Entity,
+  ManyToOne,
+  OneToOne,
+} from 'typeorm';
 import { BaseSchema } from '../../database/base-schema';
 import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 import { Customer } from '@/customers/entities/customer.entity';
@@ -8,6 +15,7 @@ import { Subscription } from '@/subscriptions/entities/subscription.entity';
 import { GatewayEnum, PaymentMethodsEnum } from '../dto/pay-charge.dto';
 import { Exclude } from 'class-transformer';
 import { Application } from '@/applications/entities/application.entity';
+import { Invoice } from '@/invoices/entities/invoice.entity';
 
 interface Pix {
   method: string;
@@ -211,6 +219,9 @@ export class Charge extends BaseSchema {
   @Column({ nullable: true })
   paidAt?: Date;
 
+  @Column({ nullable: true })
+  dueDate?: Date;
+
   @ApiProperty({
     description: 'Pix payment details, if applicable',
     allOf: [
@@ -240,6 +251,9 @@ export class Charge extends BaseSchema {
   })
   @Column({ type: 'jsonb', nullable: true })
   pix?: Pix;
+
+  @Column({ default: 'NEVER', type: 'varchar' })
+  issueInvoice: 'BEFORE_PAYMENT' | 'AFTER_PAYMENT' | 'NEVER';
 
   @Exclude()
   @Column({ type: 'jsonb', nullable: true })
@@ -271,6 +285,9 @@ export class Charge extends BaseSchema {
     nullable: true,
   })
   application: Application;
+
+  @OneToOne(() => Invoice)
+  invoice: Invoice;
 
   @BeforeInsert()
   setDefaults() {

@@ -8,6 +8,7 @@ import { Paginate, PaginateQuery } from 'nestjs-paginate';
 import { buildPaginatedDocs } from '@/utils/build-paginated-docs';
 import { PayChargeDto } from './dto/pay-charge.dto';
 import { Request } from 'express';
+import { CreateChargeDto } from './dto/create-charge.dto';
 
 @Controller('charges')
 export class ChargesController {
@@ -93,6 +94,21 @@ export class ChargesController {
 
   @Endpoint({
     method: 'POST',
+  })
+  create(
+    @Me() me: UserRequest,
+    @Body() createChargeDto: CreateChargeDto,
+    @Req() req: Request,
+  ) {
+    return this.chargesService.createCharge(
+      me,
+      createChargeDto,
+      req.application,
+    );
+  }
+
+  @Endpoint({
+    method: 'POST',
     path: 'one-step',
     documentation: {
       summary: 'Create a one-step charge',
@@ -110,7 +126,7 @@ export class ChargesController {
       },
     },
   })
-  create(
+  createOneStep(
     @Me() me: UserRequest,
     @Body() createChargeDto: CreateOneStepChargeDto,
     @Req() req: Request,

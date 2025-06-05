@@ -17,6 +17,7 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ReportsModule } from './reports/reports.module';
 import { ApplicationsModule } from './applications/applications.module';
+import { InvoicesModule } from './invoices/invoices.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { ApplicationsModule } from './applications/applications.module';
     SubscriptionsModule,
     ReportsModule,
     ApplicationsModule,
+    InvoicesModule,
   ],
   providers: [
     {

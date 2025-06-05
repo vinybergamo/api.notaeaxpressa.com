@@ -15,6 +15,7 @@ import { PayChargeDto } from './dto/pay-charge.dto';
 import { txIdGenerate } from '@/utils/txid-generate';
 import { isUUID } from 'class-validator';
 import { Application } from '@/applications/entities/application.entity';
+import { CreateChargeDto } from './dto/create-charge.dto';
 
 @Injectable()
 export class ChargesService {
@@ -35,6 +36,50 @@ export class ChargesService {
       paginateQuery,
       relations.split(/[;,\s]+/).filter(Boolean) || [],
     );
+  }
+
+  async createCharge(
+    user: UserRequest,
+    createChargeDto: CreateChargeDto,
+    application: Application | null = null,
+  ) {
+    const charges = await this.chargesRepository.find({
+      user: { id: user.id },
+    });
+
+    const customer = createChargeDto.customerId
+      ? await this.customersRepository.findByIdOrFail(
+          createChargeDto.customerId,
+          {
+            relations: ['user'],
+          },
+        )
+      : null;
+
+    if (customer && customer.user.id !== user.id) {
+      throw new NotFoundException(
+        'CUSTOMER_NOT_FOUND',
+        'Customer not found or does not belong to the user.',
+      );
+    }
+
+    const customerId = customer ? `CUS${customer.id}` : '';
+    const applicationId = application ? `APP${application.id}` : '';
+
+    const charge = await this.chargesRepository.create({
+      ...createChargeDto,
+      index: charges.length + 1,
+      correlationID: txIdGenerate(
+        `${applicationId}USER${user.id}${customerId}T${format(new Date(), 'yyyyMMddHHmmssSSS')}`,
+      ),
+      customer,
+      application,
+      user: {
+        id: user.id,
+      },
+    });
+
+    return charge;
   }
 
   async pay(chargeId: Id, payChargeDto: PayChargeDto) {
