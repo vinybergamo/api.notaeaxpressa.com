@@ -1,9 +1,10 @@
-import { Body, Controller, Query } from '@nestjs/common';
+import { Body, Controller, Query, Req } from '@nestjs/common';
 import { PlansService } from './plans.service';
 import { Endpoint } from '@/helpers/decorators/endpoint.decorator';
 import { Me } from '@/helpers/decorators/me.decorator';
 import { CreatePlanDto } from './dto/create-plan.dto';
 import { Paginate, PaginateQuery } from 'nestjs-paginate';
+import { Request } from 'express';
 
 @Controller('plans')
 export class PlansController {
@@ -23,7 +24,11 @@ export class PlansController {
   @Endpoint({
     method: 'POST',
   })
-  create(@Me() user: UserRequest, @Body() createPlanDto: CreatePlanDto) {
-    return this.plansService.create(user, createPlanDto);
+  create(
+    @Me() user: UserRequest,
+    @Body() createPlanDto: CreatePlanDto,
+    @Req() req: Request,
+  ) {
+    return this.plansService.create(user, createPlanDto, req.application);
   }
 }

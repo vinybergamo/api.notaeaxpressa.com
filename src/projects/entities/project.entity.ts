@@ -3,6 +3,7 @@ import { BaseSchema } from '../../database/base-schema';
 import { User } from '@/users/entities/user.entity';
 import { Customer } from '@/customers/entities/customer.entity';
 import { ApiProperty, ApiSchema } from '@nestjs/swagger';
+import { Application } from '@/applications/entities/application.entity';
 
 @ApiSchema({
   name: 'ProjectEntity',
@@ -112,4 +113,9 @@ export class Project extends BaseSchema {
     onDelete: 'CASCADE',
   })
   customer: Customer;
+
+  @ManyToOne(() => Application, {
+    nullable: true,
+  })
+  application: Application;
 }

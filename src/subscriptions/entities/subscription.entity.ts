@@ -4,6 +4,7 @@ import { User } from '@/users/entities/user.entity';
 import { Customer } from '@/customers/entities/customer.entity';
 import { Charge } from '@/charges/entities/charge.entity';
 import { Plan } from '@/plans/entities/plan.entity';
+import { Application } from '@/applications/entities/application.entity';
 
 @Entity()
 export class Subscription extends BaseSchema {
@@ -47,4 +48,9 @@ export class Subscription extends BaseSchema {
     cascade: true,
   })
   charges: Charge[];
+
+  @ManyToOne(() => Application, {
+    nullable: true,
+  })
+  application: Application;
 }

@@ -3,6 +3,7 @@ import { PlansRepository } from './plans.repository';
 import { Plan } from './entities/plan.entity';
 import { CreatePlanDto } from './dto/create-plan.dto';
 import { PaginateQuery } from 'nestjs-paginate';
+import { Application } from '@/applications/entities/application.entity';
 
 @Injectable()
 export class PlansService {
@@ -20,7 +21,11 @@ export class PlansService {
     );
   }
 
-  async create(user: UserRequest, createPlanDto: CreatePlanDto): Promise<Plan> {
+  async create(
+    user: UserRequest,
+    createPlanDto: CreatePlanDto,
+    application: Application | null = null,
+  ): Promise<Plan> {
     const plansCount = await this.plansRepository.count({
       user: { id: user.id },
     });
@@ -32,6 +37,7 @@ export class PlansService {
       isActive: true,
       user,
       index,
+      application: application || null,
     });
 
     return plan;

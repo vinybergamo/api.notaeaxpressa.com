@@ -14,6 +14,7 @@ import { PaginateQuery } from 'nestjs-paginate';
 import { PayChargeDto } from './dto/pay-charge.dto';
 import { txIdGenerate } from '@/utils/txid-generate';
 import { isUUID } from 'class-validator';
+import { Application } from '@/applications/entities/application.entity';
 
 @Injectable()
 export class ChargesService {
@@ -74,6 +75,7 @@ export class ChargesService {
   async createOneStep(
     user: UserRequest,
     createChargeDto: CreateOneStepChargeDto,
+    application: Application | null = null,
   ) {
     this.validateGateway(
       createChargeDto.gateway,
@@ -99,15 +101,17 @@ export class ChargesService {
     }
 
     const customerId = customer ? `CUS${customer.id}` : '';
+    const applicationId = application ? `APP${application.id}` : '';
 
     const charge = await this.chargesRepository.create({
       ...createChargeDto,
       index: charges.length + 1,
       correlationID: txIdGenerate(
-        `USER${user.id}${customerId}T${format(new Date(), 'yyyyMMddHHmmssSSS')}`,
+        `${applicationId}USER${user.id}${customerId}T${format(new Date(), 'yyyyMMddHHmmssSSS')}`,
       ),
       methods: [createChargeDto.paymentMethod],
       customer,
+      application,
       user: {
         id: user.id,
       },

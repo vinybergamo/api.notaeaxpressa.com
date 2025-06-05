@@ -3,6 +3,7 @@ import { ProjectsRepository } from './projects.repository';
 import { PaginateQuery } from 'nestjs-paginate';
 import { CustomersRepository } from '@/customers/customers.repository';
 import { CreateProjectDto } from './dto/create-project.dto';
+import { Application } from '@/applications/entities/application.entity';
 
 @Injectable()
 export class ProjectsService {
@@ -23,7 +24,11 @@ export class ProjectsService {
     );
   }
 
-  async create(user: UserRequest, createProjectDto: CreateProjectDto) {
+  async create(
+    user: UserRequest,
+    createProjectDto: CreateProjectDto,
+    application: Application | null = null,
+  ) {
     const projects = await this.projectsRepository.find({
       user: { id: user.id },
     });
@@ -48,6 +53,7 @@ export class ProjectsService {
       ...createProjectDto,
       index: projects.length + 1,
       customer,
+      application: application || null,
       user: { id: user.id },
     });
 

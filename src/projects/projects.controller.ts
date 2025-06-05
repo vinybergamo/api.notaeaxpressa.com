@@ -1,4 +1,4 @@
-import { Body, Controller, Query } from '@nestjs/common';
+import { Body, Controller, Query, Req } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { Endpoint } from '@/helpers/decorators/endpoint.decorator';
 import { Project } from './entities/project.entity';
@@ -6,6 +6,7 @@ import { buildPaginatedDocs } from '@/utils/build-paginated-docs';
 import { Me } from '@/helpers/decorators/me.decorator';
 import { Paginate, PaginateQuery } from 'nestjs-paginate';
 import { CreateProjectDto } from './dto/create-project.dto';
+import { Request } from 'express';
 
 @Controller('projects')
 export class ProjectsController {
@@ -69,7 +70,11 @@ export class ProjectsController {
       },
     },
   })
-  create(@Me() me: UserRequest, @Body() createProjectDto: CreateProjectDto) {
-    return this.projectsService.create(me, createProjectDto);
+  create(
+    @Me() me: UserRequest,
+    @Body() createProjectDto: CreateProjectDto,
+    @Req() req: Request,
+  ) {
+    return this.projectsService.create(me, createProjectDto, req.application);
   }
 }

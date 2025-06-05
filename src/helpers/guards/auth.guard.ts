@@ -72,6 +72,7 @@ export class AuthGuard implements CanActivate {
 
     if (payload.isApplication) {
       request.level = 'APPLICATION';
+      request.application = application;
     }
 
     if (!payload.isApplication) {

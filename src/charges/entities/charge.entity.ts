@@ -7,6 +7,7 @@ import * as math from 'mathjs';
 import { Subscription } from '@/subscriptions/entities/subscription.entity';
 import { GatewayEnum, PaymentMethodsEnum } from '../dto/pay-charge.dto';
 import { Exclude } from 'class-transformer';
+import { Application } from '@/applications/entities/application.entity';
 
 interface Pix {
   method: string;
@@ -265,6 +266,11 @@ export class Charge extends BaseSchema {
     onDelete: 'CASCADE',
   })
   subscription: Subscription;
+
+  @ManyToOne(() => Application, {
+    nullable: true,
+  })
+  application: Application;
 
   @BeforeInsert()
   setDefaults() {

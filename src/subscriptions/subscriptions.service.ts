@@ -9,6 +9,7 @@ import { CreateSubscriptionDto } from './dto/crate-subscription';
 import { CustomersRepository } from '@/customers/customers.repository';
 import { PlansRepository } from '@/plans/plans.repository';
 import { txIdGenerate } from '@/utils/txid-generate';
+import { Application } from '@/applications/entities/application.entity';
 
 @Injectable()
 export class SubscriptionsService {
@@ -24,6 +25,7 @@ export class SubscriptionsService {
   async create(
     user: UserRequest,
     createSubscriptionDto: CreateSubscriptionDto,
+    application: Application | null = null,
   ): Promise<Subscription> {
     const now = new Date();
     const [customer, plan] = await Promise.all([
@@ -87,6 +89,7 @@ export class SubscriptionsService {
       plan,
       user,
       customer,
+      application,
     });
 
     await this.processSubscription(subscription);
@@ -147,8 +150,11 @@ export class SubscriptionsService {
     const plan = subscription.plan;
     const customer = subscription.customer;
     const user = subscription.user;
+    const applicationId = subscription.application
+      ? `APP${subscription.application.id}`
+      : '';
     const correlationID = txIdGenerate(
-      `SUB${subscription.id}USER${user.id}CUS${customer.id}T${format(
+      `${applicationId}SUB${subscription.id}USER${user.id}CUS${customer.id}T${format(
         now,
         'yyyyMMddHHmmssSSS',
       )}`,
@@ -175,6 +181,7 @@ export class SubscriptionsService {
       customer,
       subscription,
       user,
+      application: subscription.application || null,
     });
   }
 
