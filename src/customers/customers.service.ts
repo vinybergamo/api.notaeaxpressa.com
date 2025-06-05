@@ -23,6 +23,7 @@ export class CustomersService {
   async create(user: UserRequest, createCustomerDto: CreateCustomerDto) {
     const customerExists = await this.customersRepository.find({
       correlationID: createCustomerDto.correlationID,
+      user: { id: user.id },
     });
 
     if (customerExists.length > 0) {
@@ -39,7 +40,7 @@ export class CustomersService {
     const customer = await this.customersRepository.create({
       ...createCustomerDto,
       index: customers.length + 1,
-      user: { id: user.id },
+      user,
     });
 
     return customer;
