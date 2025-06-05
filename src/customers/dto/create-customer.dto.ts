@@ -6,6 +6,9 @@ import { IsArray, IsEmail, IsOptional, IsString } from 'class-validator';
 
 export class CreateCustomerDto {
   @IsString()
+  correlationID: string;
+
+  @IsString()
   @ApiProperty({
     description: 'Name of the customer',
     example: 'Jane Doe',

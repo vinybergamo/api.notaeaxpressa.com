@@ -24,6 +24,9 @@ export class Customer extends BaseSchema {
   @Column({ default: 1 })
   index: number;
 
+  @Column({ nullable: true })
+  correlationID: string;
+
   @ApiProperty({
     description: 'Name of the customer',
     example: 'Jane Doe',

@@ -1,7 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CustomersRepository } from './customers.repository';
 import { PaginateQuery } from 'nestjs-paginate';
-import { ILike } from 'typeorm';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 
@@ -22,16 +21,9 @@ export class CustomersService {
   }
 
   async create(user: UserRequest, createCustomerDto: CreateCustomerDto) {
-    const customerExists = await this.customersRepository.find([
-      {
-        email: ILike(`%${createCustomerDto.email}%`),
-        user: { id: user.id },
-      },
-      {
-        document: ILike(`%${createCustomerDto.document}%`),
-        user: { id: user.id },
-      },
-    ]);
+    const customerExists = await this.customersRepository.find({
+      correlationID: createCustomerDto.correlationID,
+    });
 
     if (customerExists.length > 0) {
       throw new BadRequestException(
