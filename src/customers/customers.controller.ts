@@ -48,6 +48,19 @@ export class CustomersController {
   }
 
   @Endpoint({
+    method: 'GET',
+    path: ':id/charges',
+  })
+  findCharges(
+    @Me() me: UserRequest,
+    @Param('id') id: string,
+    @Paginate() paginate: PaginateQuery,
+    @Query('relations') relations: string,
+  ) {
+    return this.customersService.findCharges(me, id, paginate, relations || '');
+  }
+
+  @Endpoint({
     method: 'POST',
   })
   create(@Me() me: UserRequest, @Body() createCustomerDto: CreateCustomerDto) {

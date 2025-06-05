@@ -50,4 +50,44 @@ export class ChargesRepository extends BaseRepository<Charge> {
       relations,
     });
   }
+
+  async listByCustomer(
+    userId: number,
+    customerId: string,
+    paginateQuery: PaginateQuery,
+    relations?: string[],
+  ) {
+    const keys = Object.keys(
+      this.repo.metadata.propertiesMap,
+    ) as Column<Charge>[];
+
+    const relationsKeys = relations?.filter((relation) =>
+      this.repo.metadata.relations.find((rel) => rel.propertyName === relation),
+    );
+
+    if (relationsKeys) {
+      relations = relationsKeys;
+    } else {
+      relations = [];
+    }
+
+    return paginate(paginateQuery, this.repo, {
+      where: {
+        user: {
+          id: userId,
+        },
+        customer: {
+          correlationID: customerId,
+        },
+      },
+      sortableColumns: keys,
+      defaultLimit: 10,
+      maxLimit: 100,
+      nullSort: 'last',
+      defaultSortBy: [['id', 'DESC']],
+      filterableColumns: this.repo.metadata.propertiesMap,
+      searchableColumns: ['id', 'customer.name', 'index', 'status', 'gateway'],
+      relations,
+    });
+  }
 }

@@ -3,10 +3,14 @@ import { CustomersRepository } from './customers.repository';
 import { PaginateQuery } from 'nestjs-paginate';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { ChargesRepository } from '@/charges/charges.repository';
 
 @Injectable()
 export class CustomersService {
-  constructor(private readonly customersRepository: CustomersRepository) {}
+  constructor(
+    private readonly customersRepository: CustomersRepository,
+    private readonly chargesRepository: ChargesRepository,
+  ) {}
 
   async list(
     user: UserRequest,
@@ -17,6 +21,37 @@ export class CustomersService {
       user.id,
       paginateQuery,
       relations.split(/[;,\s]+/).filter(Boolean) || [],
+    );
+  }
+
+  async findCharges(
+    user: UserRequest,
+    customerId: string,
+    paginateQuery: PaginateQuery,
+    relations?: string,
+  ) {
+    const customer = await this.customersRepository.findOneOrFail(
+      {
+        correlationID: customerId,
+        user: { id: user.id },
+      },
+      {
+        relations: ['user'],
+      },
+    );
+
+    if (!customer || customer.user.id !== user.id) {
+      throw new BadRequestException(
+        'CUSTOMER_NOT_FOUND',
+        'Customer not found.',
+      );
+    }
+
+    return this.chargesRepository.listByCustomer(
+      user.id,
+      customerId,
+      paginateQuery,
+      relations ? relations.split(/[;,\s]+/).filter(Boolean) : [],
     );
   }
 
