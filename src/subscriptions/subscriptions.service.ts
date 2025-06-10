@@ -148,7 +148,14 @@ export class SubscriptionsService {
         nextBillingDate: LessThanOrEqual(now),
       },
       {
-        relations: ['customer', 'plan', 'charges', 'customer', 'user'],
+        relations: [
+          'customer',
+          'plan',
+          'charges',
+          'customer',
+          'user',
+          'application',
+        ],
       },
     );
 
