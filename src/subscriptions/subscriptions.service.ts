@@ -185,7 +185,7 @@ export class SubscriptionsService {
       customer,
       subscription,
       user,
-      application: subscription.application || null,
+      application: subscription?.application || null,
     });
   }
 
