@@ -100,6 +100,46 @@ export class SubscriptionsService {
   @Cron(CronExpression.EVERY_MINUTE, {
     timeZone: 'America/Sao_Paulo',
   })
+  async handleEndedSubscriptions(): Promise<void> {
+    const now = new Date();
+    const endedSubscriptions = await this.subscriptionsRepository.find({
+      status: 'ACTIVE',
+      endDate: LessThanOrEqual(now),
+    });
+
+    if (endedSubscriptions.length === 0) {
+      return;
+    }
+
+    this.logger.debug(
+      `[${format(now, 'yyyy-MM-dd HH:mm:ss')}] Processing ${endedSubscriptions.length} ended subscriptions`,
+    );
+
+    const results = await Promise.allSettled(
+      endedSubscriptions.map((subscription) =>
+        this.subscriptionsRepository.update(subscription.id, {
+          status: 'ENDED',
+          endDate: now,
+        }),
+      ),
+    );
+
+    results.forEach((result, index) => {
+      if (result.status === 'rejected') {
+        this.logger.error(
+          `Failed to update ended subscription ${endedSubscriptions[index].id}: ${result.reason}`,
+        );
+      } else {
+        this.logger.debug(
+          `Subscription ${endedSubscriptions[index].id} marked as ENDED`,
+        );
+      }
+    });
+  }
+
+  @Cron(CronExpression.EVERY_MINUTE, {
+    timeZone: 'America/Sao_Paulo',
+  })
   async handleSubscriptions(): Promise<void> {
     const now = new Date();
     const subscriptions = await this.subscriptionsRepository.find(
@@ -217,5 +257,6 @@ export class SubscriptionsService {
 
   onModuleInit() {
     this.handleSubscriptions();
+    this.handleEndedSubscriptions();
   }
 }
