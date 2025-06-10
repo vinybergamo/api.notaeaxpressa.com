@@ -4,7 +4,7 @@ import phone from 'phone';
 export function IsPhone(validationOptions?: ValidationOptions) {
   return function (obj: any, propertyName: string) {
     registerDecorator({
-      name: 'isDocument',
+      name: 'isPhone',
       target: obj.constructor,
       propertyName,
       options: validationOptions,

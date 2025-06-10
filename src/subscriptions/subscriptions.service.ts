@@ -146,6 +146,10 @@ export class SubscriptionsService {
       return;
     }
 
+    this.logger.debug(
+      `[${format(new Date(subscription.nextBillingDate), 'yyyy-MM-dd HH:mm:ss')}] - Processing subscription ${subscription.id} for user ${subscription.user.id}`,
+    );
+
     const nextBillingDate = this.getNextBillingDate(subscription);
     const plan = subscription.plan;
     const customer = subscription.customer;
