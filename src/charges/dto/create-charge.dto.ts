@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import {
+  IsArray,
   IsDate,
   IsEnum,
   IsInt,
@@ -88,6 +89,17 @@ export class CreateChargeDto {
   @IsPositive()
   @IsOptional()
   expiresIn: number;
+
+  @ApiProperty({
+    description: 'List of tags associated with the charge',
+    example: ['service', 'payment'],
+    required: false,
+    type: [String],
+  })
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  tags: string[];
 
   @ApiProperty({
     description: 'Issue invoice policy for the charge',
