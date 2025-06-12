@@ -8,6 +8,7 @@ import {
   IsOptional,
   IsPositive,
   IsString,
+  MinLength,
 } from 'class-validator';
 
 enum IssueInvoiceEnum {
@@ -53,6 +54,19 @@ export class CreateChargeDto {
   })
   @IsPositive()
   amount: number;
+
+  @IsArray()
+  @IsString({ each: true })
+  @ApiProperty({
+    description: 'List of payment methods for the charge',
+    example: ['PIX', 'CREDIT_CARD'],
+    required: false,
+    type: [String],
+  })
+  @MinLength(1, {
+    message: 'At least one payment method must be specified',
+  })
+  paymentMethods: string[];
 
   @ApiProperty({
     description: 'Description of the charge',
