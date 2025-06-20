@@ -6,7 +6,6 @@ import { OpenPixService } from 'openpix-nestjs';
 import { add, format } from 'date-fns';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import * as math from 'mathjs';
-import { PayChargeDto } from './dto/pay-charge.dto';
 
 @Injectable()
 export class OpenPixGatewayService implements GatewayFactory {
@@ -16,7 +15,7 @@ export class OpenPixGatewayService implements GatewayFactory {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  async process(charge: Charge, payChargeDto: PayChargeDto): Promise<Charge> {
+  async process(charge: Charge): Promise<Charge> {
     const correlationID = format(new Date(), 'yyyyMMddHHmmssSSS');
 
     const existsPaymet = await this.openPixService.charge
@@ -51,7 +50,7 @@ export class OpenPixGatewayService implements GatewayFactory {
         return await this.chargesRepository.update(
           charge.id,
           {
-            gateway: payChargeDto.gateway,
+            gateway: 'OPENPIX',
             gatewayChargeID: existsPaymet.transactionID,
             correlationID: charge.correlationID || correlationID,
             fee: existsPaymet.fee,
@@ -76,17 +75,18 @@ export class OpenPixGatewayService implements GatewayFactory {
           days: 1,
         });
 
-        const updatedPayment = await this.openPixService.charge.update(
+        await this.openPixService.charge.update(charge.correlationID, {
+          expiresDate: newDate,
+        });
+
+        const updatedPayment = await this.openPixService.charge.get(
           charge.correlationID,
-          {
-            expiresDate: newDate,
-          },
         );
 
         return await this.chargesRepository.update(
           charge.id,
           {
-            gateway: payChargeDto.gateway,
+            gateway: 'OPENPIX',
             gatewayChargeID: updatedPayment.transactionID,
             correlationID: charge.correlationID || correlationID,
             fee: updatedPayment.fee,
@@ -116,7 +116,7 @@ export class OpenPixGatewayService implements GatewayFactory {
     const updatedCharge = await this.chargesRepository.update(
       charge.id,
       {
-        gateway: payChargeDto.gateway,
+        gateway: 'OPENPIX',
         gatewayChargeID: payment.transactionID,
         correlationID: charge.correlationID || correlationID,
         fee: payment.fee,

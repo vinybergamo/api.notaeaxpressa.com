@@ -17,21 +17,10 @@ export enum GatewayEnum {
 export enum PaymentMethodsEnum {
   PIX = 'PIX',
   CREDIT_CARD = 'CREDIT_CARD',
+  BOLETO = 'BOLETO',
 }
 
 export class PayChargeDto {
-  @ApiProperty({
-    description: 'Gateway to be used for the charge',
-    example: 'OPENPIX',
-    required: true,
-    type: String,
-    enum: GatewayEnum,
-  })
-  @IsString()
-  @IsEnum(GatewayEnum)
-  @Transform(({ value }: { value: string }) => value.toUpperCase())
-  gateway: string;
-
   @ApiProperty({
     description: 'Payment method to be used for the charge',
     example: 'PIX',

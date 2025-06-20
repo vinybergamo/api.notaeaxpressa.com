@@ -1,15 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
+  ArrayMinSize,
   IsArray,
   IsDate,
+  IsDefined,
   IsEnum,
   IsInt,
   IsOptional,
   IsPositive,
   IsString,
-  MinLength,
+  Validate,
+  ValidateNested,
 } from 'class-validator';
+import { PaymentMethodDto } from './payment-methods';
+import { PriorityRequiredIfDuplicateMethodConstraint } from '@/helpers/validators/priority-required-if-payment-method-is-duplicate';
 
 enum IssueInvoiceEnum {
   BEFORE = 'BEFORE_PAYMENT',
@@ -56,17 +61,25 @@ export class CreateChargeDto {
   amount: number;
 
   @IsArray()
-  @IsString({ each: true })
-  @ApiProperty({
-    description: 'List of payment methods for the charge',
-    example: ['PIX', 'CREDIT_CARD'],
-    required: false,
-    type: [String],
+  @ArrayMinSize(1, {
+    message: 'At least one paymentMethod must be specified',
   })
-  @MinLength(1, {
-    message: 'At least one payment method must be specified',
+  @ValidateNested({ each: true })
+  @Type(() => PaymentMethodDto)
+  @IsDefined()
+  @Validate(PriorityRequiredIfDuplicateMethodConstraint)
+  @Transform(({ value }: { value: PaymentMethodDto[] }) => {
+    const uniqueMethods = new Map();
+    value.forEach((method) => {
+      const key = `${method.gateway}-${method.method}`;
+      if (!uniqueMethods.has(key)) {
+        uniqueMethods.set(key, method);
+      }
+    });
+
+    return Array.from(uniqueMethods.values());
   })
-  paymentMethods: string[];
+  paymentMethods: PaymentMethodDto[];
 
   @ApiProperty({
     description: 'Description of the charge',

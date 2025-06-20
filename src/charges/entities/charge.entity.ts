@@ -164,8 +164,21 @@ export class Charge extends BaseSchema {
     required: false,
     default: [],
   })
-  @Column({ default: [], type: 'text', array: true })
-  methods: PaymentMethodsEnum[];
+  @Column({
+    default: [
+      {
+        gateway: 'OPENPIX',
+        method: PaymentMethodsEnum.PIX,
+        priority: 1,
+      },
+    ],
+    type: 'jsonb',
+  })
+  paymentMethods: {
+    gateway: string;
+    method: string;
+    priority?: number;
+  }[];
 
   @ApiProperty({
     description: 'Payment method used for the charge',

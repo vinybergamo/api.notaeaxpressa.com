@@ -37,8 +37,24 @@ export class Plan extends BaseSchema {
   @Column({ type: 'text', array: true, default: [] })
   tags: string[];
 
-  @Column({ type: 'text', array: true, default: [] })
-  paymentMethods: PaymentMethodsEnum[];
+  @Column({
+    default: [
+      {
+        gateway: 'OPENPIX',
+        method: PaymentMethodsEnum.PIX,
+        priority: 1,
+      },
+    ],
+    type: 'jsonb',
+  })
+  paymentMethods: {
+    gateway: string;
+    method: string;
+    priority?: number;
+  }[];
+
+  @Column({ default: 'NEVER', type: 'varchar' })
+  issueInvoice: 'BEFORE_PAYMENT' | 'AFTER_PAYMENT' | 'NEVER';
 
   @Column({ default: false })
   isActive: boolean;

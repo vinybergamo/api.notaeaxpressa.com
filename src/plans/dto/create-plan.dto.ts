@@ -1,7 +1,7 @@
-import { PaymentMethodsEnum } from '@/charges/dto/pay-charge.dto';
+import { CreateChargeDto } from '@/charges/dto/create-charge.dto';
+import { PickType } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import {
-  IsArray,
   IsBoolean,
   IsEnum,
   IsOptional,
@@ -17,7 +17,10 @@ enum PlanIntervalEnum {
   YEAR = 'YEAR',
 }
 
-export class CreatePlanDto {
+export class CreatePlanDto extends PickType(CreateChargeDto, [
+  'paymentMethods',
+  'issueInvoice',
+] as const) {
   @IsString()
   name: string;
 
@@ -44,10 +47,6 @@ export class CreatePlanDto {
   @IsPositive()
   @IsOptional()
   trialDays?: number;
-
-  @IsArray()
-  @IsEnum(PaymentMethodsEnum, { each: true })
-  paymentMethods: PaymentMethodsEnum[];
 
   @IsBoolean()
   @IsOptional()

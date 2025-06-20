@@ -82,17 +82,41 @@ export class ChargesService {
     return charge;
   }
 
-  async pay(chargeId: Id, payChargeDto: PayChargeDto) {
+  async pay(chargeId: Id, payChargeDto: PayChargeDto, index = 0) {
     const charge = await this.chargesRepository.findByIdOrFail(chargeId, {
       relations: ['user'],
     });
 
-    this.validateGateway(payChargeDto.gateway, payChargeDto.paymentMethod);
+    const chargePaymentMethods = charge.paymentMethods || [];
 
-    return this.chosenGateway(payChargeDto.gateway).process(
-      charge,
-      payChargeDto,
+    const paymentMethodGateways = chargePaymentMethods.filter(
+      (method) =>
+        method.method.toUpperCase() ===
+        payChargeDto.paymentMethod.toUpperCase(),
     );
+
+    const sortedPaymentMethods = paymentMethodGateways.sort(
+      (a, b) => a.priority - b.priority,
+    );
+
+    if (sortedPaymentMethods.length === 0) {
+      throw new BadRequestException(
+        'PAYMENT_METHOD_NOT_FOUND',
+        `Payment method [${payChargeDto.paymentMethod}] not found for charge.`,
+      );
+    }
+    try {
+      const gateway = sortedPaymentMethods[index].gateway;
+      this.validateGateway(gateway, payChargeDto.paymentMethod);
+      const payment = await this.chosenGateway(gateway).process(charge);
+
+      return payment;
+    } catch (error) {
+      if (index < sortedPaymentMethods.length - 1) {
+        return this.pay(chargeId, payChargeDto, index + 1);
+      }
+      throw error;
+    }
   }
 
   async getPublicCharge(uuid: string) {
@@ -154,7 +178,13 @@ export class ChargesService {
       correlationID: txIdGenerate(
         `${applicationId}USER${user.id}${customerId}T${format(new Date(), 'yyyyMMddHHmmssSSS')}`,
       ),
-      methods: [createChargeDto.paymentMethod],
+      paymentMethods: [
+        {
+          gateway: createChargeDto.gateway,
+          method: createChargeDto.paymentMethod,
+          priority: 1,
+        },
+      ],
       customer,
       application,
       user: {
@@ -162,18 +192,13 @@ export class ChargesService {
       },
     });
 
-    return this.chosenGateway(createChargeDto.gateway).process(
-      charge,
-      createChargeDto,
-    );
+    return this.chosenGateway(createChargeDto.gateway).process(charge);
   }
 
   private chosenGateway(gateway: string) {
     switch (gateway.toUpperCase().trim()) {
       case 'OPENPIX':
         return this.openPixGatewayService;
-      case 'MANUAL':
-        return this.manualGatewayService;
       default:
         throw new BadRequestException(
           `UNSUPPORTED_GATEWAY`,
@@ -188,7 +213,7 @@ export class ChargesService {
     if (!validGateways.includes(gateway.toUpperCase().trim())) {
       throw new BadRequestException(
         `INVALID_GATEWAY`,
-        `The gateway "${gateway}" is not supported. Supported gateways are: ${validGateways.join(', ').toUpperCase()}`,
+        `The gateway [${gateway}] is not supported. Supported gateways are: ${validGateways.join(', ').toUpperCase()}`,
       );
     }
     const gatewayMethods = gateways[gateway.toLowerCase()].map((m) =>
@@ -198,7 +223,7 @@ export class ChargesService {
     if (!gatewayMethods.includes(method.toLowerCase())) {
       throw new BadRequestException(
         `INVALID_PAYMENT_METHOD`,
-        `The payment method "${method}" is not supported for the gateway "${gateway}". Supported methods are: ${gatewayMethods.join(', ').toUpperCase()}`,
+        `The payment method [${method}] is not supported for the gateway [${gateway}]. Supported methods are: ${gatewayMethods.join(', ').toUpperCase()}`,
       );
     }
   }
