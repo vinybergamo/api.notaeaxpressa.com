@@ -22,6 +22,25 @@ export class SubscriptionsService {
     private readonly plansRepository: PlansRepository,
   ) {}
 
+  async findOne(
+    user: UserRequest,
+    id: Id,
+    relations: string[] = [],
+  ): Promise<Subscription> {
+    const subscription = await this.subscriptionsRepository.findByIdOrFail(id, {
+      relations: ['user', ...relations],
+    });
+
+    if (!subscription || subscription.user.id !== user.id) {
+      throw new NotFoundException(
+        'SUBSCRIPTION_NOT_FOUND',
+        'Subscription not found.',
+      );
+    }
+
+    return subscription;
+  }
+
   async create(
     user: UserRequest,
     createSubscriptionDto: CreateSubscriptionDto,
