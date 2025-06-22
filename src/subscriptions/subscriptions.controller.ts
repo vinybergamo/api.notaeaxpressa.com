@@ -18,7 +18,6 @@ export class SubscriptionsController {
     @Param('id') id: Id,
     @Query('relations') relations: string,
   ) {
-    console.log(me.id);
     return this.subscriptionsService.findOne(
       me,
       id,
