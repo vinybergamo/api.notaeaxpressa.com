@@ -7,12 +7,29 @@ import {
   OnchargeView,
 } from '@/helpers/decorators/charge.decorator';
 import { Charge } from '@/charges/entities/charge.entity';
+import { ChargesRepository } from '@/charges/charges.repository';
 
 @Injectable()
 export class ChargeEventsService {
   constructor(
     private readonly chargeEventsRepository: ChargeEventsRepository,
+    private readonly chargeRepository: ChargesRepository,
   ) {}
+
+  async getChargeEvents(chargeId: Id) {
+    const charge = await this.chargeRepository.findByIdOrFail(chargeId);
+
+    return this.chargeEventsRepository.find(
+      {
+        charge: { id: charge.id },
+      },
+      {
+        order: {
+          index: 'DESC',
+        },
+      },
+    );
+  }
 
   @OnChargeCreate()
   async onChargeCreate(charge: Charge) {

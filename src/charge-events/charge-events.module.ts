@@ -4,9 +4,10 @@ import { ChargeEventsController } from './charge-events.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChargeEvents } from './entities/charge-events.entity';
 import { ChargeEventsRepository } from './charge-events.repository';
+import { ChargesModule } from '@/charges/charges.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ChargeEvents])],
+  imports: [TypeOrmModule.forFeature([ChargeEvents]), ChargesModule],
   controllers: [ChargeEventsController],
   providers: [ChargeEventsService, ChargeEventsRepository],
   exports: [ChargeEventsService, ChargeEventsRepository],
