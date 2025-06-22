@@ -25,7 +25,7 @@ export class ChargeEventsService {
       },
       {
         order: {
-          index: 'DESC',
+          id: 'DESC',
         },
       },
     );
