@@ -5,6 +5,7 @@ import { Customer } from '@/customers/entities/customer.entity';
 import { Charge } from '@/charges/entities/charge.entity';
 import { Plan } from '@/plans/entities/plan.entity';
 import { Application } from '@/applications/entities/application.entity';
+import { Company } from '@/companies/entities/company.entity';
 
 @Entity()
 export class Subscription extends BaseSchema {
@@ -30,10 +31,14 @@ export class Subscription extends BaseSchema {
   endDate: Date;
 
   @ManyToOne(() => User, (user) => user.subscriptions, {
-    onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
   user: User;
+
+  @ManyToOne(() => Company, (company) => company.subscriptions, {
+    onUpdate: 'CASCADE',
+  })
+  company: Company;
 
   @ManyToOne(() => Plan, (plan) => plan.subscriptions)
   plan: Plan;

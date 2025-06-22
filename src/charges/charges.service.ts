@@ -9,13 +9,13 @@ import { CreateOneStepChargeDto } from './dto/create-one-step-charge.dto';
 import { OpenPixGatewayService } from './openpix-gateway.service';
 import { CustomersRepository } from '@/customers/customers.repository';
 import { format } from 'date-fns';
-import { ManualGatewayService } from './manual-gateway.service';
 import { PaginateQuery } from 'nestjs-paginate';
 import { PayChargeDto } from './dto/pay-charge.dto';
 import { txIdGenerate } from '@/utils/txid-generate';
 import { isUUID } from 'class-validator';
 import { Application } from '@/applications/entities/application.entity';
 import { CreateChargeDto } from './dto/create-charge.dto';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class ChargesService {
@@ -23,7 +23,7 @@ export class ChargesService {
     private readonly chargesRepository: ChargesRepository,
     private readonly openPixGatewayService: OpenPixGatewayService,
     private readonly customersRepository: CustomersRepository,
-    private readonly manualGatewayService: ManualGatewayService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async list(
@@ -84,7 +84,7 @@ export class ChargesService {
 
   async pay(chargeId: Id, payChargeDto: PayChargeDto, index = 0) {
     const charge = await this.chargesRepository.findByIdOrFail(chargeId, {
-      relations: ['user'],
+      relations: ['user', 'customer', 'subscription', 'application', 'company'],
     });
 
     const chargePaymentMethods = charge.paymentMethods || [];
@@ -105,6 +105,11 @@ export class ChargesService {
         `Payment method [${payChargeDto.paymentMethod}] not found for charge.`,
       );
     }
+
+    if (charge.paymentMethod !== payChargeDto.paymentMethod) {
+      this.eventEmitter.emit('charges.paymentMethod.update', charge);
+    }
+
     try {
       const gateway = sortedPaymentMethods[index].gateway;
       this.validateGateway(gateway, payChargeDto.paymentMethod);
@@ -134,9 +139,17 @@ export class ChargesService {
         uuid,
       },
       {
-        relations: ['customer', 'subscription', 'user', 'subscription.plan'],
+        relations: [
+          'customer',
+          'subscription',
+          'user',
+          'subscription.plan',
+          'company',
+        ],
       },
     );
+
+    this.eventEmitter.emit('charges.view', charge);
 
     return charge;
   }
@@ -153,6 +166,7 @@ export class ChargesService {
     const charges = await this.chargesRepository.find({
       user: { id: user.id },
     });
+
     const customer = createChargeDto.customerId
       ? await this.customersRepository.findByIdOrFail(
           createChargeDto.customerId,

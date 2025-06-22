@@ -18,6 +18,8 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ReportsModule } from './reports/reports.module';
 import { ApplicationsModule } from './applications/applications.module';
 import { InvoicesModule } from './invoices/invoices.module';
+import { CompaniesModule } from './companies/companies.module';
+import { ChargeEventsModule } from './charge-events/charge-events.module';
 
 @Module({
   imports: [
@@ -59,6 +61,8 @@ import { InvoicesModule } from './invoices/invoices.module';
     ReportsModule,
     ApplicationsModule,
     InvoicesModule,
+    CompaniesModule,
+    ChargeEventsModule,
   ],
   providers: [
     {

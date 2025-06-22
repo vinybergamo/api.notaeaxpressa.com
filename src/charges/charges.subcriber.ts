@@ -24,33 +24,87 @@ export class ChargesSubscriber implements EntitySubscriberInterface<Charge> {
     return Charge;
   }
 
-  afterInsert(event: InsertEvent<Charge>) {
+  async afterInsert(event: InsertEvent<Charge>) {
     if (event.entity) {
-      this.eventEmitter.emit('charges.create', event.entity);
+      const charge = await event.manager.findOne(Charge, {
+        where: { id: event.entity.id },
+        relations: [
+          'user',
+          'company',
+          'subscription',
+          'application',
+          'customer',
+        ],
+      });
+      this.eventEmitter.emit('charges.create', charge);
     }
   }
 
-  afterUpdate(event: UpdateEvent<Charge>): Promise<any> | void {
+  async afterUpdate(event: UpdateEvent<Charge>) {
     if (event.entity) {
-      this.eventEmitter.emit('charges.update', event.entity);
+      const charge = await event.manager.findOne(Charge, {
+        where: { id: event.entity.id },
+        relations: [
+          'user',
+          'company',
+          'subscription',
+          'application',
+          'customer',
+        ],
+      });
+      this.eventEmitter.emit('charges.update', charge);
     }
   }
 
-  afterRemove(event: RemoveEvent<Charge>): Promise<any> | void {
+  async afterRemove(event: RemoveEvent<Charge>) {
     if (event.entity) {
-      this.eventEmitter.emit('charges.delete', event.entity);
+      const charge = await event.manager.findOne(Charge, {
+        where: { id: event.entity.id },
+        withDeleted: true,
+        relations: [
+          'user',
+          'company',
+          'subscription',
+          'application',
+          'customer',
+        ],
+      });
+      this.eventEmitter.emit('charges.delete', charge);
     }
   }
 
-  afterSoftRemove(event: SoftRemoveEvent<Charge>): Promise<any> | void {
+  async afterSoftRemove(event: SoftRemoveEvent<Charge>) {
     if (event.entity) {
-      this.eventEmitter.emit('charges.delete', event.entity);
+      const charge = await event.manager.findOne(Charge, {
+        where: { id: event.entity.id },
+        withDeleted: true,
+        relations: [
+          'user',
+          'company',
+          'subscription',
+          'application',
+          'customer',
+        ],
+      });
+      this.eventEmitter.emit('charges.delete', charge);
     }
   }
 
-  afterRecover(event: RecoverEvent<Charge>): Promise<any> | void {
+  async afterRecover(event: RecoverEvent<Charge>) {
     if (event.entity) {
-      this.eventEmitter.emit('charges.recover', event.entity);
+      const charge = await event.manager.findOne(Charge, {
+        where: { id: event.entity.id },
+        withDeleted: true,
+        relations: [
+          'user',
+          'company',
+          'subscription',
+          'application',
+          'customer',
+        ],
+      });
+
+      this.eventEmitter.emit('charges.recover', charge);
     }
   }
 }

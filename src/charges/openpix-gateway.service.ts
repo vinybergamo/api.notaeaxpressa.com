@@ -164,12 +164,24 @@ export class OpenPixGatewayService implements GatewayFactory {
         return;
       }
 
-      const updatedCharge = await this.chargesRepository.update(charge.id, {
-        pix: payment?.paymentMethods?.pix,
-        status: 'COMPLETED',
-        paidAt: new Date(transaction.charge.paidAt),
-        metadata: transaction || payment,
-      });
+      const updatedCharge = await this.chargesRepository.update(
+        charge.id,
+        {
+          pix: payment?.paymentMethods?.pix,
+          status: 'COMPLETED',
+          paidAt: new Date(transaction.charge.paidAt),
+          metadata: transaction || payment,
+        },
+        {
+          relations: [
+            'customer',
+            'user',
+            'company',
+            'subscription',
+            'application',
+          ],
+        },
+      );
 
       this.eventEmitter.emit('charges.completed', updatedCharge);
     } catch (error) {

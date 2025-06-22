@@ -4,6 +4,7 @@ import { Subscription } from '@/subscriptions/entities/subscription.entity';
 import { PaymentMethodsEnum } from '@/charges/dto/pay-charge.dto';
 import { User } from '@/users/entities/user.entity';
 import { Application } from '@/applications/entities/application.entity';
+import { Company } from '@/companies/entities/company.entity';
 
 @Entity()
 export class Plan extends BaseSchema {
@@ -63,6 +64,12 @@ export class Plan extends BaseSchema {
     cascade: true,
   })
   subscriptions: Subscription[];
+
+  @ManyToOne(() => Company, (company) => company.plans, {
+    onDelete: 'CASCADE',
+    nullable: true,
+  })
+  company: Company;
 
   @ManyToOne(() => User, (user) => user.plans, {
     onDelete: 'CASCADE',

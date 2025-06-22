@@ -4,6 +4,7 @@ import {
   Column,
   Entity,
   ManyToOne,
+  OneToMany,
   OneToOne,
 } from 'typeorm';
 import { BaseSchema } from '../../database/base-schema';
@@ -16,6 +17,8 @@ import { GatewayEnum, PaymentMethodsEnum } from '../dto/pay-charge.dto';
 import { Exclude } from 'class-transformer';
 import { Application } from '@/applications/entities/application.entity';
 import { Invoice } from '@/invoices/entities/invoice.entity';
+import { Company } from '@/companies/entities/company.entity';
+import { ChargeEvents } from '@/charge-events/entities/charge-events.entity';
 
 interface Pix {
   method: string;
@@ -288,6 +291,11 @@ export class Charge extends BaseSchema {
   })
   user: User;
 
+  @ManyToOne(() => Company, (company) => company.charges, {
+    nullable: true,
+  })
+  company: Company;
+
   @ManyToOne(() => Subscription, (subscription) => subscription.charges, {
     nullable: true,
     onDelete: 'CASCADE',
@@ -298,6 +306,11 @@ export class Charge extends BaseSchema {
     nullable: true,
   })
   application: Application;
+
+  @OneToMany(() => ChargeEvents, (event) => event.charge, {
+    cascade: true,
+  })
+  events: ChargeEvents[];
 
   @OneToOne(() => Invoice)
   invoice: Invoice;
