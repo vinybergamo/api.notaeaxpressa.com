@@ -106,14 +106,14 @@ export class ChargesService {
       );
     }
 
-    if (charge.paymentMethod !== payChargeDto.paymentMethod) {
-      this.eventEmitter.emit('charges.paymentMethod.update', charge);
-    }
-
     try {
       const gateway = sortedPaymentMethods[index].gateway;
       this.validateGateway(gateway, payChargeDto.paymentMethod);
       const payment = await this.chosenGateway(gateway).process(charge);
+
+      if (payment.paymentMethod !== payChargeDto.paymentMethod) {
+        this.eventEmitter.emit('charges.paymentMethod.update', payment);
+      }
 
       return payment;
     } catch (error) {
