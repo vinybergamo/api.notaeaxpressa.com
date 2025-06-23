@@ -82,6 +82,7 @@ export class ChargeEventsService {
     });
     await this.chargeEventsRepository.create({
       charge,
+      createdAt: new Date(charge.paidAt),
       index: count + 1,
       user: charge.user,
       company: charge.company,
