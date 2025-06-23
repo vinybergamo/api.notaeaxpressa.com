@@ -111,7 +111,7 @@ export class ChargesService {
       this.validateGateway(gateway, payChargeDto.paymentMethod);
       const payment = await this.chosenGateway(gateway).process(charge);
 
-      if (payment.paymentMethod !== payChargeDto.paymentMethod) {
+      if (charge.paymentMethod !== payChargeDto.paymentMethod) {
         this.eventEmitter.emit('charges.paymentMethod.update', payment);
       }
 
