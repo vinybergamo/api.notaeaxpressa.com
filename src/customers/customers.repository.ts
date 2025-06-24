@@ -48,7 +48,14 @@ export class CustomersRepository extends BaseRepository<Customer> {
       nullSort: 'last',
       defaultSortBy: [['id', 'DESC']],
       filterableColumns: this.repo.metadata.propertiesMap,
-      searchableColumns: ['index', 'email', 'name', 'document', 'phone'],
+      searchableColumns: [
+        'index',
+        'email',
+        'name',
+        'document',
+        'phone',
+        'correlationID',
+      ],
       relations,
     });
   }
