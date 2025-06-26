@@ -9,6 +9,7 @@ import { buildPaginatedDocs } from '@/utils/build-paginated-docs';
 import { PayChargeDto } from './dto/pay-charge.dto';
 import { Request } from 'express';
 import { CreateChargeDto } from './dto/create-charge.dto';
+import { RefundChargeDto } from './dto/refund-charge.dto';
 
 @Controller('charges')
 export class ChargesController {
@@ -105,6 +106,18 @@ export class ChargesController {
       createChargeDto,
       req.application,
     );
+  }
+
+  @Endpoint({
+    method: 'POST',
+    path: ':chargeId/refund',
+  })
+  refund(
+    @Me() me: UserRequest,
+    @Param('chargeId') chargeId: Id,
+    @Body() refundChargeDto: RefundChargeDto,
+  ) {
+    return this.chargesService.refund(me, chargeId, refundChargeDto);
   }
 
   @Endpoint({

@@ -16,6 +16,8 @@ import { isUUID } from 'class-validator';
 import { Application } from '@/applications/entities/application.entity';
 import { CreateChargeDto } from './dto/create-charge.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { RefundChargeDto } from './dto/refund-charge.dto';
+import { ChargeRefundsRepository } from './charge-refunds.repository';
 
 @Injectable()
 export class ChargesService {
@@ -23,6 +25,7 @@ export class ChargesService {
     private readonly chargesRepository: ChargesRepository,
     private readonly openPixGatewayService: OpenPixGatewayService,
     private readonly customersRepository: CustomersRepository,
+    private readonly chargeRefundsRepository: ChargeRefundsRepository,
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
@@ -36,6 +39,76 @@ export class ChargesService {
       paginateQuery,
       relations.split(/[;,\s]+/).filter(Boolean) || [],
     );
+  }
+
+  async refund(
+    me: UserRequest,
+    chargeId: Id,
+    refundChargeDto: RefundChargeDto,
+  ) {
+    const charge = await this.chargesRepository.findByIdOrFail(chargeId, {
+      relations: ['user', 'customer', 'subscription', 'application', 'company'],
+    });
+    const refunds = await this.chargeRefundsRepository.find({
+      charge: { id: charge.id },
+    });
+
+    if (charge.user.id !== me.id) {
+      throw new NotFoundException(
+        'CHARGE_NOT_FOUND',
+        'Charge not found or does not belong to the user.',
+      );
+    }
+
+    if (charge.status === 'CANCELED' || charge.status === 'PARTIAL_REFUNDED') {
+      throw new BadRequestException(
+        'CHARGE_ALREADY_REFUNDED',
+        'This charge has already been refunded.',
+      );
+    }
+
+    if (charge.status !== 'COMPLETED') {
+      throw new BadRequestException(
+        'CHARGE_NOT_COMPLETED',
+        'Only completed charges can be refunded.',
+      );
+    }
+
+    if (refundChargeDto.amount > charge.totalAmount) {
+      throw new BadRequestException(
+        'INVALID_REFUND_AMOUNT',
+        `The refund amount cannot exceed the total charge amount (${charge.totalAmount}).`,
+      );
+    }
+
+    const totalRefundedAmount = refunds.reduce(
+      (total, refund) => total + refund.amount,
+      0,
+    );
+
+    if (
+      totalRefundedAmount + (refundChargeDto.amount || charge.amount) >
+      charge.totalAmount
+    ) {
+      throw new BadRequestException(
+        'INVALID_REFUND_AMOUNT',
+        `The total refunded amount cannot exceed the total charge amount (${charge.totalAmount}).`,
+      );
+    }
+
+    const refund = await this.chargeRefundsRepository.create({
+      correlationID: txIdGenerate(
+        `REFUND${charge.id}T${format(new Date(), 'yyyyMMddHHmmssSSS')}`,
+      ),
+      amount: refundChargeDto.amount || charge.amount,
+      charge,
+      status: 'PROCESSING',
+      comment: refundChargeDto.comment,
+    });
+
+    this.eventEmitter.emit('charges.refund.create', refund);
+
+    return this.chosenGateway(charge.gateway).refund(refund);
   }
 
   async createCharge(

@@ -31,3 +31,6 @@ export const OnchargeView = (options?: OnEventOptions) =>
 
 export const OnChargePaymentMethodUpdate = (options?: OnEventOptions) =>
   applyDecorators(OnEvent('charges.paymentMethod.update', options));
+
+export const OnChargeRefundCreate = (options?: OnEventOptions) =>
+  applyDecorators(OnEvent('charges.refund.create', options));

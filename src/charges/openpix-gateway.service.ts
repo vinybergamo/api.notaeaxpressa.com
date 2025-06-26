@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { GatewayFactory } from './gateway.factory';
 import { ChargesRepository } from './charges.repository';
 import { Charge } from './entities/charge.entity';
@@ -6,12 +10,15 @@ import { OpenPixService } from 'openpix-nestjs';
 import { add, format } from 'date-fns';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import * as math from 'mathjs';
+import { ChargeRefunds } from './entities/charge-refunds';
+import { ChargeRefundsRepository } from './charge-refunds.repository';
 
 @Injectable()
 export class OpenPixGatewayService implements GatewayFactory {
   constructor(
     private readonly chargesRepository: ChargesRepository,
     private readonly openPixService: OpenPixService,
+    private readonly chargeRefundsRepository: ChargeRefundsRepository,
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
@@ -138,6 +145,56 @@ export class OpenPixGatewayService implements GatewayFactory {
     return updatedCharge;
   }
 
+  async refund(chargeRefund: ChargeRefunds) {
+    const payment = await this.openPixService.charge.get(
+      chargeRefund.charge.correlationID,
+    );
+
+    const transaction = await this.openPixService.transaction.get(
+      payment.transactionID,
+    );
+
+    if (!payment) {
+      throw new NotFoundException('CHARGE_NOT_FOUND');
+    }
+
+    if (payment.paymentMethods?.pix?.status !== 'COMPLETED') {
+      throw new BadRequestException('CHARGE_NOT_COMPLETED');
+    }
+
+    const refund = await this.openPixService.refunds
+      .refund({
+        correlationID: chargeRefund.correlationID,
+        transactionEndToEndId: transaction.endToEndId,
+        value: chargeRefund.amount,
+        comment: chargeRefund.comment,
+      })
+      .catch((error) => {
+        console.error('Error processing refund:', error);
+        throw error;
+      });
+
+    if (!refund) {
+      throw new BadRequestException('REFUND_FAILED');
+    }
+
+    const updatedChargeRefund = await this.chargeRefundsRepository.update(
+      chargeRefund.id,
+      {
+        status: refund.pixTransactionRefund.status,
+        refundedAt: new Date(refund.pixTransactionRefund?.time || Date.now()),
+        gatewayId: refund.pixTransactionRefund?.returnIdentification,
+        refundId: refund.pixTransactionRefund?.refundId,
+        metadata: refund,
+      },
+      {
+        relations: ['charge'],
+      },
+    );
+
+    return updatedChargeRefund;
+  }
+
   @OnEvent('openpix.charges.paid', { async: true })
   async onChargePaid(payload: any): Promise<void> {
     try {
@@ -147,6 +204,7 @@ export class OpenPixGatewayService implements GatewayFactory {
       const transaction = transactions.transactions.find(
         (t) =>
           t.charge?.identifier === payload.identifier &&
+          t.type === 'PAYMENT' &&
           t.charge.status === 'COMPLETED',
       );
 
@@ -171,6 +229,7 @@ export class OpenPixGatewayService implements GatewayFactory {
           status: 'COMPLETED',
           paidAt: new Date(transaction.charge.paidAt),
           metadata: transaction || payment,
+          endToEndId: transaction?.endToEndId,
         },
         {
           relations: [

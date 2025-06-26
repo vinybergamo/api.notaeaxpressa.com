@@ -19,6 +19,7 @@ import { Application } from '@/applications/entities/application.entity';
 import { Invoice } from '@/invoices/entities/invoice.entity';
 import { Company } from '@/companies/entities/company.entity';
 import { ChargeEvents } from '@/charge-events/entities/charge-events.entity';
+import { ChargeRefunds } from './charge-refunds';
 
 interface Pix {
   method: string;
@@ -132,6 +133,8 @@ export class Charge extends BaseSchema {
       'EXPIRED',
       'PROCESSING',
       'REFUSED',
+      'PARTIAL_REFUNDED',
+      'REFUNDED',
     ],
     default: 'PENDING',
   })
@@ -147,6 +150,8 @@ export class Charge extends BaseSchema {
     | 'REFUNDED'
     | 'EXPIRED'
     | 'PROCESSING'
+    | 'PARTIAL_REFUNDED'
+    | 'REFUNDED'
     | 'REFUSED';
 
   @ApiProperty({
@@ -190,6 +195,9 @@ export class Charge extends BaseSchema {
   })
   @Column({ nullable: true })
   paymentMethod?: string;
+
+  @Column({ nullable: true })
+  endToEndId?: string;
 
   @ApiProperty({
     description: 'URL for the charge, if applicable',
@@ -314,6 +322,11 @@ export class Charge extends BaseSchema {
 
   @OneToOne(() => Invoice)
   invoice: Invoice;
+
+  @OneToMany(() => ChargeRefunds, (refund) => refund.charge, {
+    cascade: true,
+  })
+  refunds: ChargeRefunds[];
 
   @BeforeInsert()
   setDefaults() {
