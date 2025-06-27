@@ -1,10 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
-const openPixEventMapper = {
-  CHARGE_COMPLETED: 'charges.paid',
-};
-
 @Injectable()
 export class WebhooksService {
   constructor(private readonly eventEmitter: EventEmitter2) {}
@@ -22,10 +18,6 @@ export class WebhooksService {
   }
 
   private handleOpenPixWebhook(body: any) {
-    const [gateway, event] = body.event.split(':');
-    this.eventEmitter.emit(openPixEventMapper[event], {
-      gateway,
-      payload: body,
-    });
+    this.eventEmitter.emit(body.event, body.charge);
   }
 }

@@ -195,7 +195,7 @@ export class OpenPixGatewayService implements GatewayFactory {
     return updatedChargeRefund;
   }
 
-  @OnEvent('openpix.charges.paid', { async: true })
+  @OnEvent('OPENPIX:CHARGE_COMPLETED', { async: true })
   async onChargePaid(payload: any): Promise<void> {
     try {
       const transactions = await this.openPixService.transaction.list({
@@ -245,6 +245,45 @@ export class OpenPixGatewayService implements GatewayFactory {
       this.eventEmitter.emit('charges.completed', updatedCharge);
     } catch (error) {
       console.error('Error processing charge paid event:', error);
+    }
+  }
+
+  @OnEvent('OPENPIX:CHARGE_EXPIRED', { async: true })
+  async onChargeExpired(payload: any): Promise<void> {
+    try {
+      const payment = await this.openPixService.charge.get(payload.identifier);
+      const charge = await this.chargesRepository.findOne({
+        correlationID: payload.correlationID,
+      });
+
+      if (!charge) {
+        return;
+      }
+
+      if (charge.status === 'EXPIRED') {
+        return;
+      }
+
+      const updatedCharge = await this.chargesRepository.update(
+        charge.id,
+        {
+          pix: payment?.paymentMethods?.pix,
+          metadata: payment,
+        },
+        {
+          relations: [
+            'customer',
+            'user',
+            'company',
+            'subscription',
+            'application',
+          ],
+        },
+      );
+
+      this.eventEmitter.emit('charges.pix.expired', updatedCharge);
+    } catch (error) {
+      console.error('Error processing charge expired event:', error);
     }
   }
 }
