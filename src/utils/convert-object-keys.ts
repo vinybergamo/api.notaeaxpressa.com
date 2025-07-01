@@ -4,6 +4,18 @@ interface Options {
   deleteNullValues?: boolean;
 }
 
+type DotNotationKeys<T, Prefix extends string = ''> = {
+  [K in keyof T & string]: T[K] extends object
+    ? T[K] extends any[]
+      ? `${Prefix}${K}` // não entra no array
+      : `${Prefix}${K}` | DotNotationKeys<T[K], `${Prefix}${K}.`>
+    : `${Prefix}${K}`;
+}[keyof T & string];
+
+type ExtractBase<T> = T extends Array<infer U> ? U : T;
+
+type MapperType<T> = Partial<Record<DotNotationKeys<ExtractBase<T>>, string>>;
+
 function setDeepValue(obj: any, path: string, value: any) {
   const keys = path.split('.');
   let current = obj;
@@ -19,9 +31,9 @@ function setDeepValue(obj: any, path: string, value: any) {
   });
 }
 
-export function convertObjectKeys(
-  obj: any,
-  mapper: Record<string, string>,
+export function convertObjectKeys<T = any>(
+  obj: T,
+  mapper: MapperType<T> | MapperType<T>[],
   options: Options = {},
 ): any {
   const {
