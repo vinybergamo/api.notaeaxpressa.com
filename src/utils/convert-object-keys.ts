@@ -7,7 +7,7 @@ interface Options {
 type DotNotationKeys<T, Prefix extends string = ''> = {
   [K in keyof T & string]: T[K] extends object
     ? T[K] extends any[]
-      ? `${Prefix}${K}` // não entra no array
+      ? `${Prefix}${K}`
       : `${Prefix}${K}` | DotNotationKeys<T[K], `${Prefix}${K}.`>
     : `${Prefix}${K}`;
 }[keyof T & string];
