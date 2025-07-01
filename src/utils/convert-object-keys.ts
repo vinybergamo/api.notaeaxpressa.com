@@ -1,6 +1,7 @@
 interface Options {
   deleteNotMapped?: boolean;
   parser?: Record<string, (value: any) => any>;
+  deleteNullValues?: boolean;
 }
 
 function setDeepValue(obj: any, path: string, value: any) {
@@ -23,9 +24,17 @@ export function convertObjectKeys(
   mapper: Record<string, string>,
   options: Options = {},
 ): any {
-  const { deleteNotMapped = false, parser = {} } = options;
+  const {
+    deleteNotMapped = false,
+    parser = {},
+    deleteNullValues = false,
+  } = options;
 
   function recurse(current: any, path: string[] = []): any {
+    if (deleteNullValues && current === null) {
+      return undefined;
+    }
+
     if (Array.isArray(current)) {
       return current.map((item) => recurse(item, path));
     }
