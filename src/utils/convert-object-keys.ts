@@ -1,31 +1,69 @@
 interface Options {
-  deleteNonExistent?: boolean;
+  deleteNotMapped?: boolean;
+  parser?: Record<string, (value: any) => any>;
+}
+
+function setDeepValue(obj: any, path: string, value: any) {
+  const keys = path.split('.');
+  let current = obj;
+  keys.forEach((key, index) => {
+    if (index === keys.length - 1) {
+      current[key] = value;
+    } else {
+      if (!current[key] || typeof current[key] !== 'object') {
+        current[key] = {};
+      }
+      current = current[key];
+    }
+  });
 }
 
 export function convertObjectKeys(
   obj: any,
   mapper: Record<string, string>,
   options: Options = {},
-) {
-  const { deleteNonExistent = false } = options;
+): any {
+  const { deleteNotMapped = false, parser = {} } = options;
 
-  if (Array.isArray(obj)) {
-    return obj.map((iten) => convertObjectKeys(iten, mapper, options));
-  }
+  function recurse(current: any, path: string[] = []): any {
+    if (Array.isArray(current)) {
+      return current.map((item) => recurse(item, path));
+    }
 
-  if (obj !== null && typeof obj === 'object') {
-    return Object.entries(obj).reduce((acc, [key, value]) => {
-      const mappedKey = mapper[key];
+    if (current !== null && typeof current === 'object') {
+      const localResult: any = {};
 
-      if (!mappedKey && deleteNonExistent) {
-        return acc;
+      for (const [key, value] of Object.entries(current)) {
+        const fullPath = [...path, key].join('.');
+        const mappedPath = mapper[fullPath];
+
+        const hasMappedChildren = Object.keys(mapper).some((k) =>
+          k.startsWith(fullPath + '.'),
+        );
+
+        const hasParser = parser[fullPath] !== undefined;
+
+        const shouldInclude =
+          !!mappedPath || hasMappedChildren || hasParser || !deleteNotMapped;
+
+        if (!shouldInclude) continue;
+
+        const parsedOrRecursed = hasParser
+          ? parser[fullPath](value)
+          : recurse(value, [...path, key]);
+
+        if (mappedPath) {
+          setDeepValue(localResult, mappedPath, parsedOrRecursed);
+        } else if (!deleteNotMapped) {
+          localResult[key] = parsedOrRecursed;
+        }
       }
 
-      const newKey = mappedKey || key;
-      acc[newKey] = convertObjectKeys(value, mapper, options);
-      return acc;
-    }, {});
+      return localResult;
+    }
+
+    return current;
   }
 
-  return obj;
+  return recurse(obj);
 }
