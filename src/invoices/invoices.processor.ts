@@ -63,17 +63,7 @@ export class InvoicesProcessor extends WorkerHost {
           deleteNullValues: true,
           parser: {
             issueDate: (value: Date) => {
-              const date = new Date(value);
-              const utc = Date.UTC(
-                date.getFullYear(),
-                date.getMonth(),
-                date.getDate(),
-                date.getHours(),
-                date.getMinutes(),
-                date.getSeconds(),
-              );
-
-              return new Date(utc).toISOString();
+              return new Date(value).toISOString();
             },
             amount: (value: number) => math.divide(value, 100),
             description: (value?: string) => {
