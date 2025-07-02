@@ -21,6 +21,7 @@ import { InvoicesModule } from './invoices/invoices.module';
 import { CompaniesModule } from './companies/companies.module';
 import { ChargeEventsModule } from './charge-events/charge-events.module';
 import { BullModule } from '@nestjs/bullmq';
+import { MailerModule } from './mailer/mailer.module';
 
 @Module({
   imports: [
@@ -75,6 +76,7 @@ import { BullModule } from '@nestjs/bullmq';
     InvoicesModule,
     CompaniesModule,
     ChargeEventsModule,
+    MailerModule,
   ],
   providers: [
     {

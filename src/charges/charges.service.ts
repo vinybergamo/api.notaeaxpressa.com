@@ -161,6 +161,7 @@ export class ChargesService {
       correlationID: txIdGenerate(
         `${applicationId}USER${user.id}${customerId}T${format(new Date(), 'yyyyMMddHHmmssSSS')}`,
       ),
+      invoiceServiceCode: createChargeDto.invoice.serviceCode,
       customer,
       application,
       user,

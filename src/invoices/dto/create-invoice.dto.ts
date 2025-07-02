@@ -34,4 +34,7 @@ export class CreateInvoiceDto {
   @IsString()
   @IsOptional()
   description: string;
+
+  @IsString()
+  serviceCode: string;
 }

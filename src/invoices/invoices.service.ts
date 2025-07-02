@@ -121,18 +121,25 @@ export class InvoicesService {
 
     const status = this.convertStatus(data.status);
 
-    const updatedInvoice = await this.invoicesRepository.update(invoice.id, {
-      status,
-      rpsNumber: data.numero_rps,
-      rpsSeries: data.serie_rps,
-      rpsType: data.tipo_rps,
-      danfseUlr: data.url_danfse,
-      verificationCode: data.codigo_verificacao,
-      nfseNumber: data.numero,
-      xmlPath: data.caminho_xml_nota_fiscal,
-      metadata: data,
-      url: data.url,
-    });
+    const updatedInvoice = await this.invoicesRepository.update(
+      invoice.id,
+      {
+        status,
+        issueDate: new Date(data.data_emissao),
+        rpsNumber: data.numero_rps,
+        rpsSeries: data.serie_rps,
+        rpsType: data.tipo_rps,
+        danfseUlr: data.url_danfse,
+        verificationCode: data.codigo_verificacao,
+        nfseNumber: data.numero,
+        xmlPath: data.caminho_xml_nota_fiscal,
+        metadata: data,
+        url: data.url,
+      },
+      {
+        relations: ['company', 'charge', 'customer'],
+      },
+    );
 
     this.eventEmitter.emit(`invoices.${status.toLowerCase()}`, updatedInvoice);
   }
@@ -145,6 +152,7 @@ export class InvoicesService {
       customerId: charge.customer?.uuid,
       chargeId: charge.uuid,
       issueDate: new Date(),
+      serviceCode: charge.invoiceServiceCode,
     });
 
     await this.invoicesQueue.add('proccess', invoice, {

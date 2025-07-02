@@ -279,6 +279,9 @@ export class Charge extends BaseSchema {
   @Column({ default: 'NEVER', type: 'varchar' })
   issueInvoice: 'BEFORE_PAYMENT' | 'AFTER_PAYMENT' | 'NEVER';
 
+  @Column({ nullable: true })
+  invoiceServiceCode: string;
+
   @Exclude()
   @Column({ type: 'jsonb', nullable: true })
   metadata?: Record<string, any>;

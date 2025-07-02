@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PickType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
   ArrayMinSize,
@@ -11,16 +11,20 @@ import {
   IsPositive,
   IsString,
   Validate,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator';
 import { PaymentMethodDto } from './payment-methods';
 import { PriorityRequiredIfDuplicateMethodConstraint } from '@/helpers/validators/priority-required-if-payment-method-is-duplicate';
+import { CreateInvoiceDto } from '@/invoices/dto/create-invoice.dto';
 
 enum IssueInvoiceEnum {
   BEFORE = 'BEFORE_PAYMENT',
   AFTER = 'AFTER_PAYMENT',
   NEVER = 'NEVER',
 }
+
+class InvoiceDto extends PickType(CreateInvoiceDto, ['serviceCode'] as const) {}
 
 export class CreateChargeDto {
   @ApiProperty({
@@ -140,4 +144,14 @@ export class CreateChargeDto {
   @IsOptional()
   @IsEnum(IssueInvoiceEnum)
   issueInvoice: IssueInvoiceEnum;
+
+  @ValidateIf(
+    (o: CreateChargeDto) =>
+      o.issueInvoice === IssueInvoiceEnum.AFTER ||
+      o.issueInvoice === IssueInvoiceEnum.BEFORE,
+  )
+  @IsDefined()
+  @ValidateNested({ each: true })
+  @Type(() => InvoiceDto)
+  invoice: InvoiceDto;
 }

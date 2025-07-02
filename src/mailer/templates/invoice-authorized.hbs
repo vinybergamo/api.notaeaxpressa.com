@@ -1,0 +1,279 @@
+<html lang='pt-BR'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Nota Fiscal Eletrônica - Vinybergamo</title>
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    </noscript>
+    <![endif]-->
+  </head>
+  <body
+    style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; background-color: #f8fafc; line-height: 1.6;"
+  >
+
+    <!-- Container Principal -->
+    <table
+      role='presentation'
+      cellspacing='0'
+      cellpadding='0'
+      border='0'
+      width='100%'
+      style='background-color: #f8fafc;'
+    >
+      <tr>
+        <td style='padding: 40px 20px;'>
+
+          <!-- Email Container -->
+          <table
+            role='presentation'
+            cellspacing='0'
+            cellpadding='0'
+            border='0'
+            width='100%'
+            style='max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); overflow: hidden;'
+          >
+
+            <!-- Header -->
+            <tr>
+              <td
+                style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center;'
+              >
+                <h1
+                  style='margin: 0; color: #ffffff; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;'
+                >
+                  Vinybergamo
+                </h1>
+                <p
+                  style='margin: 8px 0 0 0; color: #e2e8f0; font-size: 14px; font-weight: 400;'
+                >
+                  Programação e Desenvolvimento de Software
+                </p>
+              </td>
+            </tr>
+
+            <!-- Conteúdo Principal -->
+            <tr>
+              <td style='padding: 40px 30px;'>
+
+                <!-- Saudação -->
+                <h2
+                  style='margin: 0 0 20px 0; color: #1e293b; font-size: 24px; font-weight: 600;'
+                >
+                  Olá,
+                  {{customer.name}}!
+                </h2>
+
+                <p
+                  style='margin: 0 0 30px 0; color: #475569; font-size: 16px; line-height: 1.6;'
+                >
+                  Sua
+                  <strong>Nota Fiscal Eletrônica de Serviço</strong>
+                  foi emitida com sucesso. Abaixo você encontra os detalhes da
+                  sua nota fiscal:
+                </p>
+
+                <!-- Card da Nota Fiscal -->
+                <table
+                  role='presentation'
+                  cellspacing='0'
+                  cellpadding='0'
+                  border='0'
+                  width='100%'
+                  style='background-color: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 30px;'
+                >
+                  <tr>
+                    <td style='padding: 25px;'>
+
+                      <!-- Número da NF -->
+                      <div style='margin-bottom: 20px;'>
+                        <p
+                          style='margin: 0 0 5px 0; color: #64748b; font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;'
+                        >
+                          Número da Nota Fiscal
+                        </p>
+                        <p
+                          style='margin: 0; color: #1e293b; font-size: 20px; font-weight: 700;'
+                        >
+                          {{rpsNumber}}
+                        </p>
+                      </div>
+
+                      <!-- Detalhes em Grid -->
+                      <table
+                        role='presentation'
+                        cellspacing='0'
+                        cellpadding='0'
+                        border='0'
+                        width='100%'
+                      >
+                        <tr>
+                          <td
+                            style='width: 50%; padding-right: 15px; vertical-align: top;'
+                          >
+                            <p
+                              style='margin: 0 0 5px 0; color: #64748b; font-size: 14px; font-weight: 500;'
+                            >
+                              Data de Emissão
+                            </p>
+                            <p
+                              style='margin: 0 0 15px 0; color: #1e293b; font-size: 16px; font-weight: 600;'
+                            >
+                              {{issueDate}}
+                            </p>
+                          </td>
+                          <td
+                            style='width: 50%; padding-left: 15px; vertical-align: top;'
+                          >
+                            <p
+                              style='margin: 0 0 5px 0; color: #64748b; font-size: 14px; font-weight: 500;'
+                            >
+                              Valor Total
+                            </p>
+                            <p
+                              style='margin: 0 0 15px 0; color: #059669; font-size: 18px; font-weight: 700;'
+                            >
+                              {{amount}}
+                            </p>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td
+                            style='width: 50%; padding-right: 15px; vertical-align: top;'
+                          >
+                            <p
+                              style='margin: 0 0 5px 0; color: #64748b; font-size: 14px; font-weight: 500;'
+                            >
+                              Código de Verificação
+                            </p>
+                            <p
+                              style="margin: 0; color: #1e293b; font-size: 14px; font-weight: 600; font-family: 'Courier New', monospace;"
+                            >
+                              {{verificationCode}}
+                            </p>
+                          </td>
+                          <td
+                            style='width: 50%; padding-left: 15px; vertical-align: top;'
+                          >
+                            <p
+                              style='margin: 0 0 5px 0; color: #64748b; font-size: 14px; font-weight: 500;'
+                            >
+                              Descrição do Serviço
+                            </p>
+                            <p
+                              style='margin: 0; color: #1e293b; font-size: 14px; font-weight: 600;'
+                            >
+                              {{description}}
+                            </p>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- Botão de Visualizar -->
+                <div style='text-align: center; margin-bottom: 30px;'>
+                  <a
+                    href='{{url}}'
+                    style='display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-weight: 600; font-size: 16px; letter-spacing: 0.5px; transition: all 0.3s ease;'
+                  >
+                    Visualizar Nota Fiscal
+                  </a>
+                </div>
+
+                <!-- Informações Adicionais -->
+                <div
+                  style='background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; border-radius: 0 8px 8px 0; margin-bottom: 30px;'
+                >
+                  <p
+                    style='margin: 0; color: #92400e; font-size: 14px; line-height: 1.5;'
+                  >
+                    <strong>Importante:</strong>
+                    Mantenha esta nota fiscal para seus registros contábeis. Em
+                    caso de dúvidas, entre em contato conosco através dos canais
+                    abaixo.
+                  </p>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td
+                style='background-color: #f8fafc; padding: 30px; border-top: 1px solid #e2e8f0;'
+              >
+
+                <!-- Dados da Empresa -->
+                <div style='text-align: center; margin-bottom: 25px;'>
+                  <h3
+                    style='margin: 0 0 15px 0; color: #1e293b; font-size: 18px; font-weight: 600;'
+                  >
+                    Vinybergamo
+                  </h3>
+                  <p
+                    style='margin: 0 0 8px 0; color: #64748b; font-size: 14px;'
+                  >
+                    <strong>CNPJ:</strong>
+                    49.219.537/0001-36
+                  </p>
+                </div>
+
+                <!-- Contatos -->
+                <div style='text-align: center; margin-bottom: 25px;'>
+                  <table
+                    role='presentation'
+                    cellspacing='0'
+                    cellpadding='0'
+                    border='0'
+                    width='100%'
+                  >
+                    <tr>
+                      <td style='text-align: center; padding: 8px;'>
+                        <a
+                          href='mailto:financeiro@vinybergamo.com'
+                          style='color: #667eea; text-decoration: none; font-size: 14px; font-weight: 500;'
+                        >
+                          financeiro@vinybergamo.com
+                        </a>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style='text-align: center; padding: 8px;'>
+                        <a
+                          href='https://wa.me/5513991291316'
+                          style='color: #25d366; text-decoration: none; font-size: 14px; font-weight: 500;'
+                        >
+                          (13) 99129-1316 - WhatsApp
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+
+                <!-- Rodapé -->
+                <div
+                  style='text-align: center; padding-top: 20px; border-top: 1px solid #e2e8f0;'
+                >
+                  <p
+                    style='margin: 0; color: #94a3b8; font-size: 12px; line-height: 1.4;'
+                  >
+                    Este é um e-mail automático. Por favor, não responda
+                    diretamente a esta mensagem.<br />
+                    Para dúvidas ou suporte, utilize nossos canais de contato
+                    acima.
+                  </p>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
