@@ -5,6 +5,10 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 export class WebhooksService {
   constructor(private readonly eventEmitter: EventEmitter2) {}
 
+  handleInvoiceWebhook(type: string, body: any) {
+    this.eventEmitter.emit(`webhooks.invoice.${type}`, body);
+  }
+
   handleChargeWebhook(gateway: string, body: any) {
     return this.chooseGateway(gateway, body);
   }

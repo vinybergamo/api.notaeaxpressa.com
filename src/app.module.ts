@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DatabaseModule } from './database/database.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
@@ -20,6 +20,7 @@ import { ApplicationsModule } from './applications/applications.module';
 import { InvoicesModule } from './invoices/invoices.module';
 import { CompaniesModule } from './companies/companies.module';
 import { ChargeEventsModule } from './charge-events/charge-events.module';
+import { BullModule } from '@nestjs/bullmq';
 
 @Module({
   imports: [
@@ -44,6 +45,17 @@ import { ChargeEventsModule } from './charge-events/charge-events.module';
           limit: 100,
         },
       ],
+    }),
+    BullModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        connection: {
+          url: configService.get<string>(
+            'REDIS_URL',
+            'redis://localhost:6379/0',
+          ),
+        },
+      }),
     }),
     EventEmitterModule.forRoot({
       global: true,

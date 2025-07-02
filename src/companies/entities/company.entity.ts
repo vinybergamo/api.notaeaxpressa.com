@@ -41,6 +41,12 @@ export class Company extends BaseSchema {
   @Column({ nullable: true })
   countryCode: string;
 
+  @Column({ nullable: true })
+  municipalSubscription: string;
+
+  @Column({ nullable: true })
+  municipalCode: string;
+
   @ManyToOne(() => User, (user) => user.companies, {
     onDelete: 'CASCADE',
     nullable: false,

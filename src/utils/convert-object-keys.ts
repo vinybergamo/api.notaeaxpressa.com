@@ -4,16 +4,26 @@ interface Options {
   deleteNullValues?: boolean;
 }
 
-type DotNotationKeys<T, Prefix extends string = ''> = {
-  [K in keyof T & string]: T[K] extends object
-    ? T[K] extends any[]
-      ? `${Prefix}${K}`
-      : `${Prefix}${K}` | DotNotationKeys<T[K], `${Prefix}${K}.`>
-    : `${Prefix}${K}`;
-}[keyof T & string];
+// Lista de níveis de profundidade (0 a 9)
+type Prev = [never, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
+// Recursivo até profundidade D
+type DotNotationKeys<T, Prefix extends string = '', D extends number = 5> = [
+  D,
+] extends [never]
+  ? never
+  : {
+      [K in keyof T & string]: T[K] extends object
+        ? T[K] extends any[]
+          ? `${Prefix}${K}`
+          : `${Prefix}${K}` | DotNotationKeys<T[K], `${Prefix}${K}.`, Prev[D]>
+        : `${Prefix}${K}`;
+    }[keyof T & string];
+
+// Extrai o tipo base do array
 type ExtractBase<T> = T extends Array<infer U> ? U : T;
 
+// Tipo final para mapper
 type MapperType<T> = Partial<Record<DotNotationKeys<ExtractBase<T>>, string>>;
 
 function setDeepValue(obj: any, path: string, value: any) {

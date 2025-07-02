@@ -18,6 +18,7 @@ import { CreateChargeDto } from './dto/create-charge.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { RefundChargeDto } from './dto/refund-charge.dto';
 import { ChargeRefundsRepository } from './charge-refunds.repository';
+import { CompaniesRepository } from '@/companies/companies.repository';
 
 @Injectable()
 export class ChargesService {
@@ -26,6 +27,7 @@ export class ChargesService {
     private readonly openPixGatewayService: OpenPixGatewayService,
     private readonly customersRepository: CustomersRepository,
     private readonly chargeRefundsRepository: ChargeRefundsRepository,
+    private readonly companiesRepository: CompaniesRepository,
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
@@ -116,6 +118,20 @@ export class ChargesService {
     createChargeDto: CreateChargeDto,
     application: Application | null = null,
   ) {
+    const company = await this.companiesRepository.findByIdOrFail(
+      createChargeDto.companyId,
+      {
+        relations: ['user'],
+      },
+    );
+
+    if (company.user.id !== user.id) {
+      throw new NotFoundException(
+        'COMPANY_NOT_FOUND',
+        'Company not found or does not belong to the user.',
+      );
+    }
+
     const charges = await this.chargesRepository.find({
       user: { id: user.id },
     });
@@ -147,9 +163,8 @@ export class ChargesService {
       ),
       customer,
       application,
-      user: {
-        id: user.id,
-      },
+      user,
+      company,
     });
 
     return charge;

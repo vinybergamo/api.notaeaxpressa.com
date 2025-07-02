@@ -8,6 +8,22 @@ export class WebhooksController {
 
   @Endpoint({
     method: 'POST',
+    path: 'invoices/:type',
+    isPublic: true,
+    throttle: {
+      skip: true,
+    },
+  })
+  handleInvoiceWebhook(@Param('type') type: string, @Body() body: any) {
+    this.webhooksService.handleInvoiceWebhook(type, body);
+    return {
+      type,
+      message: 'Webhook received',
+    };
+  }
+
+  @Endpoint({
+    method: 'POST',
     path: 'charges/:gateway',
     isPublic: true,
     documentation: {

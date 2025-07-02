@@ -14,10 +14,12 @@ import { ManualGatewayService } from './manual-gateway.service';
 import { ChargesSubscriber } from './charges.subcriber';
 import { ChargeRefunds } from './entities/charge-refunds';
 import { ChargeRefundsRepository } from './charge-refunds.repository';
+import { Company } from '@/companies/entities/company.entity';
+import { CompaniesRepository } from '@/companies/companies.repository';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Charge, Customer, ChargeRefunds]),
+    TypeOrmModule.forFeature([Charge, Customer, ChargeRefunds, Company]),
     OpenPixModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -49,6 +51,7 @@ import { ChargeRefundsRepository } from './charge-refunds.repository';
     CustomersRepository,
     ChargesSubscriber,
     ChargeRefundsRepository,
+    CompaniesRepository,
   ],
   exports: [ChargesService, ChargesRepository],
 })
