@@ -21,7 +21,7 @@ export class Invoice extends BaseSchema {
   @Column()
   issueDate: Date;
 
-  @Column({ default: '04316' })
+  @Column({ default: '1402' })
   serviceCode: string;
 
   @Column({ nullable: true })
