@@ -27,6 +27,7 @@ export class ChargeEventsService {
         order: {
           id: 'DESC',
         },
+        relations: this.chargeEventsRepository.relations,
       },
     );
   }
