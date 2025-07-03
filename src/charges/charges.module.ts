@@ -18,6 +18,8 @@ import { Company } from '@/companies/entities/company.entity';
 import { CompaniesRepository } from '@/companies/companies.repository';
 import { Gateway } from './entities/gateway.entity';
 import { GatewaysRepository } from './gateways.repository';
+import { GatewaysService } from './gateways.service';
+import { GatewaysController } from './gateways.controller';
 
 @Module({
   imports: [
@@ -49,7 +51,7 @@ import { GatewaysRepository } from './gateways.repository';
       },
     }),
   ],
-  controllers: [ChargesController],
+  controllers: [ChargesController, GatewaysController],
   providers: [
     ChargesService,
     ChargesRepository,
@@ -61,6 +63,7 @@ import { GatewaysRepository } from './gateways.repository';
     ChargeRefundsRepository,
     CompaniesRepository,
     GatewaysRepository,
+    GatewaysService,
   ],
   exports: [ChargesService, ChargesRepository],
 })

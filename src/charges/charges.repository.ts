@@ -46,7 +46,7 @@ export class ChargesRepository extends BaseRepository<Charge> {
       nullSort: 'last',
       defaultSortBy: [['id', 'DESC']],
       filterableColumns: this.repo.metadata.propertiesMap,
-      searchableColumns: ['id', 'customer.name', 'index', 'status', 'gateway'],
+      searchableColumns: ['id', 'customer.name', 'index', 'status'],
       relations,
     });
   }

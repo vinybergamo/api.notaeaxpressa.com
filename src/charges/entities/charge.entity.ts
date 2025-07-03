@@ -14,7 +14,7 @@ import { Customer } from '@/customers/entities/customer.entity';
 import { User } from '@/users/entities/user.entity';
 import * as math from 'mathjs';
 import { Subscription } from '@/subscriptions/entities/subscription.entity';
-import { GatewayEnum, PaymentMethodsEnum } from '../dto/pay-charge.dto';
+import { PaymentMethodsEnum } from '../dto/pay-charge.dto';
 import { Exclude } from 'class-transformer';
 import { Application } from '@/applications/entities/application.entity';
 import { Invoice } from '@/invoices/entities/invoice.entity';
@@ -87,15 +87,6 @@ export class Charge extends BaseSchema {
   })
   @Column({ default: 0 })
   totalAmount: number;
-
-  @ApiProperty({
-    description: 'Gateway used for the charge',
-    example: 'OPENPIX',
-    required: false,
-    enum: GatewayEnum,
-  })
-  @Column({ nullable: true })
-  gateway: string;
 
   @ApiProperty({
     description: 'Fee associated with the charge in cents',
@@ -308,7 +299,7 @@ export class Charge extends BaseSchema {
   @ManyToOne(() => Gateway, {
     nullable: true,
   })
-  gatewayEntity: Gateway;
+  gateway: Gateway;
 
   @ManyToOne(() => Company, (company) => company.charges, {
     nullable: true,

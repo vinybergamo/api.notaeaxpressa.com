@@ -142,13 +142,8 @@ export class ChargesController {
   createOneStep(
     @Me() me: UserRequest,
     @Body() createChargeDto: CreateOneStepChargeDto,
-    @Req() req: Request,
   ) {
-    return this.chargesService.createOneStep(
-      me,
-      createChargeDto,
-      req.application,
-    );
+    return this.chargesService.createOneStep(me, createChargeDto);
   }
 
   @Endpoint({

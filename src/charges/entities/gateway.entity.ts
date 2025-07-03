@@ -9,6 +9,9 @@ export class Gateway extends BaseSchema {
   index: number;
 
   @Column({ nullable: true })
+  name: string;
+
+  @Column({ nullable: true })
   correlationID: string;
 
   @Column()

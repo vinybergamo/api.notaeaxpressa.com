@@ -19,6 +19,9 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { RefundChargeDto } from './dto/refund-charge.dto';
 import { ChargeRefundsRepository } from './charge-refunds.repository';
 import { CompaniesRepository } from '@/companies/companies.repository';
+import { whereId } from '@/utils/where-id';
+import { GatewaysRepository } from './gateways.repository';
+import { ILike } from 'typeorm';
 
 @Injectable()
 export class ChargesService {
@@ -29,6 +32,7 @@ export class ChargesService {
     private readonly chargeRefundsRepository: ChargeRefundsRepository,
     private readonly companiesRepository: CompaniesRepository,
     private readonly eventEmitter: EventEmitter2,
+    private readonly gatewaysRepository: GatewaysRepository,
   ) {}
 
   async list(
@@ -49,7 +53,7 @@ export class ChargesService {
     refundChargeDto: RefundChargeDto,
   ) {
     const charge = await this.chargesRepository.findByIdOrFail(chargeId, {
-      relations: ['user', 'customer', 'subscription', 'application', 'company'],
+      relations: this.chargesRepository.relations,
     });
     const refunds = await this.chargeRefundsRepository.find({
       charge: { id: charge.id },
@@ -110,7 +114,12 @@ export class ChargesService {
 
     this.eventEmitter.emit('charges.refund.create', refund);
 
-    return this.chosenGateway(charge.gateway).refund(refund);
+    const gateway = await this.gatewaysRepository.findOneOrFail({
+      name: ILike(`${charge.gateway}`),
+      company: { id: charge.company.id },
+    });
+
+    return this.chosenGateway(gateway.bank).refund(refund);
   }
 
   async createCharge(
@@ -118,17 +127,33 @@ export class ChargesService {
     createChargeDto: CreateChargeDto,
     application: Application | null = null,
   ) {
-    const company = await this.companiesRepository.findOne(
-      [
-        {
-          user: { id: user.id },
-          isDefault: true,
-        },
-      ],
+    const companyByIdQuery = createChargeDto.companyId
+      ? this.companiesRepository.findOne(
+          {
+            ...whereId(createChargeDto.companyId),
+            user: { id: user.id },
+          },
+          {
+            relations: ['user'],
+          },
+        )
+      : Promise.resolve(null);
+    const companyDefaultQuery = this.companiesRepository.findOne(
+      {
+        user: { id: user.id },
+        isDefault: true,
+      },
       {
         relations: ['user'],
       },
     );
+
+    const [companyById, companyDefault] = await Promise.all([
+      companyByIdQuery,
+      companyDefaultQuery,
+    ]);
+
+    const company = companyById || companyDefault;
 
     if (!company) {
       throw new NotFoundException(
@@ -208,9 +233,24 @@ export class ChargesService {
     }
 
     try {
-      const gateway = sortedPaymentMethods[index].gateway;
-      this.validateGateway(gateway, payChargeDto.paymentMethod);
-      const payment = await this.chosenGateway(gateway).process(charge);
+      const gateway = await this.gatewaysRepository.findOneOrFail({
+        name: ILike(`${sortedPaymentMethods[index].gateway}`),
+        company: { id: charge.company.id },
+      });
+
+      const updatedCharge = await this.chargesRepository.update(
+        charge.id,
+        {
+          gateway: gateway,
+        },
+        {
+          relations: this.chargesRepository.relations,
+        },
+      );
+
+      const payment = await this.chosenGateway(gateway.bank).process(
+        updatedCharge,
+      );
 
       if (charge.paymentMethod !== payChargeDto.paymentMethod) {
         this.eventEmitter.emit('charges.paymentMethod.update', payment);
@@ -252,15 +292,11 @@ export class ChargesService {
   async createOneStep(
     user: UserRequest,
     createChargeDto: CreateOneStepChargeDto,
-    application: Application | null = null,
   ) {
     this.validateGateway(
       createChargeDto.gateway,
       createChargeDto.paymentMethod,
     );
-    const charges = await this.chargesRepository.find({
-      user: { id: user.id },
-    });
 
     const customer = createChargeDto.customerId
       ? await this.customersRepository.findByIdOrFail(
@@ -277,31 +313,6 @@ export class ChargesService {
         'Customer not found or does not belong to the user.',
       );
     }
-
-    const customerId = customer ? `CUS${customer.id}` : '';
-    const applicationId = application ? `APP${application.id}` : '';
-
-    const charge = await this.chargesRepository.create({
-      ...createChargeDto,
-      index: charges.length + 1,
-      correlationID: txIdGenerate(
-        `${applicationId}USER${user.id}${customerId}T${format(new Date(), 'yyyyMMddHHmmssSSS')}`,
-      ),
-      paymentMethods: [
-        {
-          gateway: createChargeDto.gateway,
-          method: createChargeDto.paymentMethod,
-          priority: 1,
-        },
-      ],
-      customer,
-      application,
-      user: {
-        id: user.id,
-      },
-    });
-
-    return this.chosenGateway(createChargeDto.gateway).process(charge);
   }
 
   private chosenGateway(gateway: string) {

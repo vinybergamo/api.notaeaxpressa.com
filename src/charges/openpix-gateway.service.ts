@@ -14,7 +14,6 @@ import { ChargeRefunds } from './entities/charge-refunds';
 import { ChargeRefundsRepository } from './charge-refunds.repository';
 import { GatewaysRepository } from './gateways.repository';
 import { createClient } from '@woovi/node-sdk';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class OpenPixGatewayService implements GatewayFactory {
@@ -24,17 +23,11 @@ export class OpenPixGatewayService implements GatewayFactory {
     private readonly chargeRefundsRepository: ChargeRefundsRepository,
     private readonly gatewaysRepository: GatewaysRepository,
     private readonly eventEmitter: EventEmitter2,
-    private readonly configService: ConfigService,
   ) {}
 
   async process(charge: Charge): Promise<Charge> {
     const correlationID = format(new Date(), 'yyyyMMddHHmmssSSS');
-    const gateway = await this.gatewaysRepository.findOneOrFail({
-      bank: 'OPENPIX',
-      company: {
-        id: charge.company.id,
-      },
-    });
+    const gateway = charge.gateway;
 
     if (!gateway.clientId || !gateway.clientSecret) {
       throw new BadRequestException(
@@ -77,7 +70,7 @@ export class OpenPixGatewayService implements GatewayFactory {
             url: existsPaymet.paymentLinkUrl,
             paymentMethod: 'PIX',
             pix: existsPaymet?.paymentMethods?.pix,
-            gatewayEntity: gateway,
+            gateway: gateway,
             metadata: existsPaymet,
           },
           {
@@ -90,7 +83,6 @@ export class OpenPixGatewayService implements GatewayFactory {
         return await this.chargesRepository.update(
           charge.id,
           {
-            gateway: 'OPENPIX',
             gatewayChargeID: existsPaymet.transactionID,
             correlationID: charge.correlationID || correlationID,
             fee: existsPaymet.fee,
@@ -102,7 +94,7 @@ export class OpenPixGatewayService implements GatewayFactory {
               expiresAt: new Date(existsPaymet.expiresDate),
               expiresIn: existsPaymet.expiresIn,
             },
-            gatewayEntity: gateway,
+            gateway: gateway,
             metadata: existsPaymet,
           },
           {
@@ -127,7 +119,6 @@ export class OpenPixGatewayService implements GatewayFactory {
         return await this.chargesRepository.update(
           charge.id,
           {
-            gateway: gateway.bank,
             gatewayChargeID: updatedPayment.transactionID,
             correlationID: charge.correlationID || correlationID,
             fee: updatedPayment.fee,
@@ -139,7 +130,7 @@ export class OpenPixGatewayService implements GatewayFactory {
               expiresAt: new Date(updatedPayment.expiresDate),
               expiresIn: updatedPayment.expiresIn,
             },
-            gatewayEntity: gateway,
+            gateway: gateway,
             metadata: updatedPayment,
           },
           {
@@ -149,18 +140,17 @@ export class OpenPixGatewayService implements GatewayFactory {
       }
     }
 
-    const payment = (await woovi.charge
+    const payment = await woovi.charge
       .create({
         value: math.add(charge.amount, charge.additionalFee ?? 0),
         comment: charge.description ?? undefined,
         correlationID: charge.correlationID || correlationID,
       })
-      .then((res) => res.charge)) as any;
+      .then((res) => res.charge);
 
     const updatedCharge = await this.chargesRepository.update(
       charge.id,
       {
-        gateway: gateway.bank,
         gatewayChargeID: payment.transactionID,
         correlationID: charge.correlationID || correlationID,
         fee: payment.fee,
@@ -170,10 +160,10 @@ export class OpenPixGatewayService implements GatewayFactory {
           ...payment?.paymentMethods?.pix,
           key: payment?.pixKey,
           expiresAt: new Date(payment.expiresDate),
-          expiresIn: payment.expiresIn,
+          expiresIn: payment.expiresIn as unknown as number,
         },
         metadata: payment,
-        gatewayEntity: gateway,
+        gateway: gateway,
       },
       {
         relations: ['customer'],

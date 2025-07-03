@@ -17,7 +17,6 @@ export class ManualGatewayService implements GatewayFactory {
       status: 'COMPLETED',
       gatewayChargeID: `MANUAL:${randomUUID()}`,
       paidAt: new Date(),
-      gateway: 'MANUAL',
       paymentMethod: 'MANUAL',
     });
 

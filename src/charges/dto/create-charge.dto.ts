@@ -37,6 +37,10 @@ export class CreateChargeDto {
   @IsOptional()
   customerId: string;
 
+  @IsString()
+  @IsOptional()
+  companyId: string;
+
   @ApiProperty({
     description:
       'Additional fee for the charge in cents, must be a positive integer',
