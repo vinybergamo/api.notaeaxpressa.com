@@ -27,6 +27,9 @@ export class Gateway extends BaseSchema {
   @Column({ default: [], type: 'text', array: true })
   paymentMethods: string[];
 
+  @Column({ nullable: true })
+  pixKey: string;
+
   @ManyToOne(() => Company)
   company: Company;
 }
