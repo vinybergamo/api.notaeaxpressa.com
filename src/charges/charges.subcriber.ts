@@ -14,7 +14,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 @EventSubscriber()
 export class ChargesSubscriber implements EntitySubscriberInterface<Charge> {
   constructor(
-    datasource: DataSource,
+    private readonly datasource: DataSource,
     private readonly eventEmitter: EventEmitter2,
   ) {
     datasource.subscribers.push(this);
@@ -28,13 +28,7 @@ export class ChargesSubscriber implements EntitySubscriberInterface<Charge> {
     if (event.entity) {
       const charge = await event.manager.findOne(Charge, {
         where: { id: event.entity.id },
-        relations: [
-          'user',
-          'company',
-          'subscription',
-          'application',
-          'customer',
-        ],
+        relations: this.relations,
       });
       this.eventEmitter.emit('charges.create', charge);
     }
@@ -44,13 +38,7 @@ export class ChargesSubscriber implements EntitySubscriberInterface<Charge> {
     if (event.entity) {
       const charge = await event.manager.findOne(Charge, {
         where: { id: event.entity.id },
-        relations: [
-          'user',
-          'company',
-          'subscription',
-          'application',
-          'customer',
-        ],
+        relations: this.relations,
       });
       this.eventEmitter.emit('charges.update', charge);
     }
@@ -61,13 +49,7 @@ export class ChargesSubscriber implements EntitySubscriberInterface<Charge> {
       const charge = await event.manager.findOne(Charge, {
         where: { id: event.entity.id },
         withDeleted: true,
-        relations: [
-          'user',
-          'company',
-          'subscription',
-          'application',
-          'customer',
-        ],
+        relations: this.relations,
       });
       this.eventEmitter.emit('charges.delete', charge);
     }
@@ -78,13 +60,7 @@ export class ChargesSubscriber implements EntitySubscriberInterface<Charge> {
       const charge = await event.manager.findOne(Charge, {
         where: { id: event.entity.id },
         withDeleted: true,
-        relations: [
-          'user',
-          'company',
-          'subscription',
-          'application',
-          'customer',
-        ],
+        relations: this.relations,
       });
       this.eventEmitter.emit('charges.delete', charge);
     }
@@ -95,16 +71,14 @@ export class ChargesSubscriber implements EntitySubscriberInterface<Charge> {
       const charge = await event.manager.findOne(Charge, {
         where: { id: event.entity.id },
         withDeleted: true,
-        relations: [
-          'user',
-          'company',
-          'subscription',
-          'application',
-          'customer',
-        ],
+        relations: this.relations,
       });
 
       this.eventEmitter.emit('charges.recover', charge);
     }
   }
+
+  private relations = this.datasource
+    .getMetadata(Charge)
+    .relations.map((relation) => relation.propertyName);
 }
