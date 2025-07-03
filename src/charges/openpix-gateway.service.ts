@@ -12,6 +12,9 @@ import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import * as math from 'mathjs';
 import { ChargeRefunds } from './entities/charge-refunds';
 import { ChargeRefundsRepository } from './charge-refunds.repository';
+import { GatewaysRepository } from './gateways.repository';
+import { createClient } from '@woovi/node-sdk';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class OpenPixGatewayService implements GatewayFactory {
@@ -19,14 +22,43 @@ export class OpenPixGatewayService implements GatewayFactory {
     private readonly chargesRepository: ChargesRepository,
     private readonly openPixService: OpenPixService,
     private readonly chargeRefundsRepository: ChargeRefundsRepository,
+    private readonly gatewaysRepository: GatewaysRepository,
     private readonly eventEmitter: EventEmitter2,
+    private readonly configService: ConfigService,
   ) {}
 
   async process(charge: Charge): Promise<Charge> {
     const correlationID = format(new Date(), 'yyyyMMddHHmmssSSS');
+    const gateway = await this.gatewaysRepository.findOneOrFail({
+      bank: 'OPENPIX',
+      company: {
+        id: charge.company.id,
+      },
+    });
 
-    const existsPaymet = await this.openPixService.charge
-      .get(charge.correlationID)
+    if (!gateway.clientId || !gateway.clientSecret) {
+      throw new BadRequestException(
+        'GATEWAY_NOT_CONFIGURED',
+        `Gateway OPENPIX not configured for company ${charge.company.id}. Please configure the gateway before processing charges.`,
+      );
+    }
+
+    const appId = Buffer.from(
+      `${gateway.clientId}:${gateway.clientSecret}`,
+    ).toString('base64');
+
+    const woovi = createClient({
+      appId,
+      baseUrl: gateway.isSandbox
+        ? 'https://api.woovi-sandbox.com'
+        : 'https://api.openpix.com',
+    });
+
+    const existsPaymet = await woovi.charge
+      .get({
+        id: charge.correlationID,
+      })
+      .then((res) => res.charge)
       .catch(() => null);
 
     if (!!existsPaymet) {
@@ -45,6 +77,7 @@ export class OpenPixGatewayService implements GatewayFactory {
             url: existsPaymet.paymentLinkUrl,
             paymentMethod: 'PIX',
             pix: existsPaymet?.paymentMethods?.pix,
+            gatewayEntity: gateway,
             metadata: existsPaymet,
           },
           {
@@ -69,6 +102,7 @@ export class OpenPixGatewayService implements GatewayFactory {
               expiresAt: new Date(existsPaymet.expiresDate),
               expiresIn: existsPaymet.expiresIn,
             },
+            gatewayEntity: gateway,
             metadata: existsPaymet,
           },
           {
@@ -93,7 +127,7 @@ export class OpenPixGatewayService implements GatewayFactory {
         return await this.chargesRepository.update(
           charge.id,
           {
-            gateway: 'OPENPIX',
+            gateway: gateway.bank,
             gatewayChargeID: updatedPayment.transactionID,
             correlationID: charge.correlationID || correlationID,
             fee: updatedPayment.fee,
@@ -105,6 +139,7 @@ export class OpenPixGatewayService implements GatewayFactory {
               expiresAt: new Date(updatedPayment.expiresDate),
               expiresIn: updatedPayment.expiresIn,
             },
+            gatewayEntity: gateway,
             metadata: updatedPayment,
           },
           {
@@ -114,16 +149,18 @@ export class OpenPixGatewayService implements GatewayFactory {
       }
     }
 
-    const payment = await this.openPixService.charge.create({
-      value: math.add(charge.amount, charge.additionalFee ?? 0),
-      comment: charge.description ?? undefined,
-      correlationID: charge.correlationID || correlationID,
-    });
+    const payment = (await woovi.charge
+      .create({
+        value: math.add(charge.amount, charge.additionalFee ?? 0),
+        comment: charge.description ?? undefined,
+        correlationID: charge.correlationID || correlationID,
+      })
+      .then((res) => res.charge)) as any;
 
     const updatedCharge = await this.chargesRepository.update(
       charge.id,
       {
-        gateway: 'OPENPIX',
+        gateway: gateway.bank,
         gatewayChargeID: payment.transactionID,
         correlationID: charge.correlationID || correlationID,
         fee: payment.fee,
@@ -136,6 +173,7 @@ export class OpenPixGatewayService implements GatewayFactory {
           expiresIn: payment.expiresIn,
         },
         metadata: payment,
+        gatewayEntity: gateway,
       },
       {
         relations: ['customer'],

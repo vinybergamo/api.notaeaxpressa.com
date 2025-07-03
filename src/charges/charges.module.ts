@@ -16,10 +16,18 @@ import { ChargeRefunds } from './entities/charge-refunds';
 import { ChargeRefundsRepository } from './charge-refunds.repository';
 import { Company } from '@/companies/entities/company.entity';
 import { CompaniesRepository } from '@/companies/companies.repository';
+import { Gateway } from './entities/gateway.entity';
+import { GatewaysRepository } from './gateways.repository';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Charge, Customer, ChargeRefunds, Company]),
+    TypeOrmModule.forFeature([
+      Charge,
+      Customer,
+      ChargeRefunds,
+      Company,
+      Gateway,
+    ]),
     OpenPixModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -52,6 +60,7 @@ import { CompaniesRepository } from '@/companies/companies.repository';
     ChargesSubscriber,
     ChargeRefundsRepository,
     CompaniesRepository,
+    GatewaysRepository,
   ],
   exports: [ChargesService, ChargesRepository],
 })

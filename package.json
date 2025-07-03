@@ -39,6 +39,7 @@
     "@nestjs/swagger": "^11.2.0",
     "@nestjs/throttler": "^6.4.0",
     "@nestjs/typeorm": "^10.0.2",
+    "@woovi/node-sdk": "^1.2.7",
     "axios": "^1.10.0",
     "bcrypt": "^5.1.1",
     "bullmq": "^5.56.0",

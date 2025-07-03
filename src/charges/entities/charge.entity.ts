@@ -20,6 +20,7 @@ import { Invoice } from '@/invoices/entities/invoice.entity';
 import { Company } from '@/companies/entities/company.entity';
 import { ChargeEvents } from '@/charge-events/entities/charge-events.entity';
 import { ChargeRefunds } from './charge-refunds';
+import { Gateway } from './gateway.entity';
 
 interface Pix {
   method: string;
@@ -301,6 +302,11 @@ export class Charge extends BaseSchema {
     onDelete: 'CASCADE',
   })
   user: User;
+
+  @ManyToOne(() => Gateway, {
+    nullable: true,
+  })
+  gatewayEntity: Gateway;
 
   @ManyToOne(() => Company, (company) => company.charges, {
     nullable: true,
