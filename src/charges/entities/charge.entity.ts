@@ -3,6 +3,7 @@ import {
   BeforeUpdate,
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   OneToOne,
@@ -303,6 +304,7 @@ export class Charge extends BaseSchema {
   })
   user: User;
 
+  @JoinColumn()
   @ManyToOne(() => Gateway, {
     nullable: true,
   })
@@ -319,6 +321,7 @@ export class Charge extends BaseSchema {
   })
   subscription: Subscription;
 
+  @JoinColumn()
   @ManyToOne(() => Application, {
     nullable: true,
   })
@@ -329,6 +332,7 @@ export class Charge extends BaseSchema {
   })
   events: ChargeEvents[];
 
+  @JoinColumn()
   @OneToOne(() => Invoice)
   invoice: Invoice;
 

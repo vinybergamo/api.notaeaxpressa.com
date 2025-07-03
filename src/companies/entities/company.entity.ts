@@ -47,6 +47,9 @@ export class Company extends BaseSchema {
   @Column({ nullable: true })
   municipalCode: string;
 
+  @Column({ default: false })
+  isDefault: boolean;
+
   @ManyToOne(() => User, (user) => user.companies, {
     onDelete: 'CASCADE',
     nullable: false,

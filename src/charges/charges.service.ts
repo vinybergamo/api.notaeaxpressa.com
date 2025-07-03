@@ -118,12 +118,24 @@ export class ChargesService {
     createChargeDto: CreateChargeDto,
     application: Application | null = null,
   ) {
-    const company = await this.companiesRepository.findByIdOrFail(
-      createChargeDto.companyId,
+    const company = await this.companiesRepository.findOne(
+      [
+        {
+          user: { id: user.id },
+          isDefault: true,
+        },
+      ],
       {
         relations: ['user'],
       },
     );
+
+    if (!company) {
+      throw new NotFoundException(
+        'COMPANY_NOT_FOUND',
+        'No default company found for the user.',
+      );
+    }
 
     if (company.user.id !== user.id) {
       throw new NotFoundException(
@@ -173,7 +185,7 @@ export class ChargesService {
 
   async pay(chargeId: Id, payChargeDto: PayChargeDto, index = 0) {
     const charge = await this.chargesRepository.findByIdOrFail(chargeId, {
-      relations: ['user', 'customer', 'subscription', 'application', 'company'],
+      relations: this.chargesRepository.relations,
     });
 
     const chargePaymentMethods = charge.paymentMethods || [];
@@ -228,13 +240,7 @@ export class ChargesService {
         uuid,
       },
       {
-        relations: [
-          'customer',
-          'subscription',
-          'user',
-          'subscription.plan',
-          'company',
-        ],
+        relations: this.chargesRepository.relations,
       },
     );
 

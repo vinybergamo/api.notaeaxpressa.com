@@ -270,13 +270,7 @@ export class OpenPixGatewayService implements GatewayFactory {
           endToEndId: transaction?.endToEndId,
         },
         {
-          relations: [
-            'customer',
-            'user',
-            'company',
-            'subscription',
-            'application',
-          ],
+          relations: this.chargesRepository.relations,
         },
       );
 
@@ -309,13 +303,7 @@ export class OpenPixGatewayService implements GatewayFactory {
           metadata: payment,
         },
         {
-          relations: [
-            'customer',
-            'user',
-            'company',
-            'subscription',
-            'application',
-          ],
+          relations: this.chargesRepository.relations,
         },
       );
 

@@ -20,6 +20,12 @@ export class BaseRepository<T extends BaseSchema>
     this.entity = this.entity.replace(/_/g, ' ').toUpperCase();
   }
 
+  get relations(): string[] {
+    return this.repository.metadata.relations.map(
+      (relation) => relation.propertyName,
+    );
+  }
+
   async findAll(options?: FindManyOptions<T>): Promise<T[]> {
     return this.repository.find(options);
   }
@@ -57,6 +63,17 @@ export class BaseRepository<T extends BaseSchema>
 
   async findByIdOrFail(id: Id, options?: FindOneOptions<T>): Promise<T> {
     return this.findOneOrFail(whereId(id), options);
+  }
+
+  async exists(
+    criteria: FindCriteria<T>,
+    options?: FindOneOptions<T>,
+  ): Promise<boolean> {
+    const entity = await this.repository.exists({
+      where: criteria,
+      ...options,
+    });
+    return !!entity;
   }
 
   async create(data: DeepPartial<T>): Promise<T> {
