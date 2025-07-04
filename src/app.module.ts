@@ -22,6 +22,7 @@ import { CompaniesModule } from './companies/companies.module';
 import { ChargeEventsModule } from './charge-events/charge-events.module';
 import { BullModule } from '@nestjs/bullmq';
 import { MailerModule } from './mailer/mailer.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -78,6 +79,7 @@ import { MailerModule } from './mailer/mailer.module';
     ChargeEventsModule,
     MailerModule,
   ],
+  controllers: [AppController],
   providers: [
     {
       provide: APP_GUARD,
