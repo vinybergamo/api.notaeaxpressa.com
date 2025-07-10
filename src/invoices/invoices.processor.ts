@@ -44,7 +44,10 @@ export class InvoicesProcessor extends WorkerHost {
 
     try {
       const payload = convertObjectKeys(
-        invoice,
+        {
+          ...invoice,
+          serviceTaxCode: invoice.serviceCode,
+        },
         {
           issueDate: 'data_emissao',
           company: 'prestador',
@@ -53,6 +56,7 @@ export class InvoicesProcessor extends WorkerHost {
           'company.municipalSubscription': 'inscricao_municipal',
           amount: 'servico.valor_servicos',
           serviceCode: 'servico.item_lista_servico',
+          serviceTaxCode: 'servico.codigo_tributario_municipio',
           description: 'servico.discriminacao',
           customer: 'tomador',
           'customer.document': `${invoice?.customer?.documentType?.split(':')[1]?.toLowerCase()}`,
