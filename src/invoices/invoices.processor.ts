@@ -46,10 +46,16 @@ export class InvoicesProcessor extends WorkerHost {
       const payload = convertObjectKeys(
         {
           ...invoice,
-          serviceTaxCode: invoice.serviceCode,
+          serviceTaxCode: '9511800',
+          issWithheld: false,
+          nature: 1,
+          isSimple: true,
+          tax: 2,
         },
         {
           issueDate: 'data_emissao',
+          nature: 'natureza_operacao',
+          isSimple: 'optante_simples_nacional',
           company: 'prestador',
           'company.document': `${invoice?.company?.documentType?.split(':')[1].toLowerCase()}`,
           'company.municipalCode': 'codigo_municipio',
@@ -58,6 +64,8 @@ export class InvoicesProcessor extends WorkerHost {
           serviceCode: 'servico.item_lista_servico',
           serviceTaxCode: 'servico.codigo_tributario_municipio',
           description: 'servico.discriminacao',
+          issWithheld: 'servico.iss_retido',
+          tax: 'servico.aliquota',
           customer: 'tomador',
           'customer.document': `${invoice?.customer?.documentType?.split(':')[1]?.toLowerCase()}`,
           'customer.name': 'razao_social',
