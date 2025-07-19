@@ -3,10 +3,13 @@ import { Job } from 'bullmq';
 import { Invoice } from './entities/invoice.entity';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
-import { format, milliseconds } from 'date-fns';
+import { format, milliseconds, parseISO } from 'date-fns';
 import { convertObjectKeys } from '@/utils/convert-object-keys';
 import * as math from 'mathjs';
 import { InvoicesRepository } from './invoices.repository';
+import { format as formatTz, toZonedTime } from 'date-fns-tz';
+
+const TIME_ZONE = 'America/Sao_Paulo';
 
 @Processor('invoices')
 export class InvoicesProcessor extends WorkerHost {
@@ -67,7 +70,14 @@ export class InvoicesProcessor extends WorkerHost {
           deleteNullValues: true,
           parser: {
             issueDate: (value: Date) => {
-              return format(value, 'yyyy-MM-dd');
+              if (!value) {
+                return undefined;
+              }
+
+              const date = parseISO(value.toString());
+              return formatTz(toZonedTime(date, TIME_ZONE), 'yyyy-MM-dd', {
+                timeZone: TIME_ZONE,
+              });
             },
             amount: (value: number) => math.divide(value, 100),
             description: (value?: string) => {
