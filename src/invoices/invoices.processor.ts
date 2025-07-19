@@ -75,9 +75,16 @@ export class InvoicesProcessor extends WorkerHost {
               }
 
               const date = parseISO(value.toString());
-              return formatTz(toZonedTime(date, TIME_ZONE), 'yyyy-MM-dd', {
-                timeZone: TIME_ZONE,
-              });
+              const formattedDate = formatTz(
+                toZonedTime(date, TIME_ZONE),
+                'yyyy-MM-dd',
+                {
+                  timeZone: TIME_ZONE,
+                },
+              );
+
+              console.log('Formatted issue date:', formattedDate);
+              return formattedDate;
             },
             amount: (value: number) => math.divide(value, 100),
             description: (value?: string) => {
