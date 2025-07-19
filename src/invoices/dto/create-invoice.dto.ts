@@ -37,4 +37,36 @@ export class CreateInvoiceDto {
 
   @IsString()
   serviceCode: string;
+
+  @IsInt()
+  @IsOptional()
+  operationType?: number;
+
+  @IsInt()
+  @IsOptional()
+  simpleNationalOptIn?: boolean;
+
+  @IsInt()
+  @IsOptional()
+  withheldISS?: boolean;
+
+  @IsString()
+  @IsOptional()
+  serviceListItem?: string;
+
+  @IsString()
+  @IsOptional()
+  taxCode?: string;
+
+  @IsInt()
+  @IsOptional()
+  rate?: number;
+
+  @IsString()
+  @IsOptional()
+  providerMunicipalRegistration?: string;
+
+  @IsString()
+  @IsOptional()
+  providerCityCode?: string;
 }

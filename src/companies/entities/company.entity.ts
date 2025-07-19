@@ -42,13 +42,31 @@ export class Company extends BaseSchema {
   countryCode: string;
 
   @Column({ nullable: true })
-  municipalSubscription: string;
+  municipalRegistration: string;
 
   @Column({ nullable: true })
-  municipalCode: string;
+  cityCode: string;
 
   @Column({ default: false })
   isDefault: boolean;
+
+  @Column({ nullable: true })
+  defaultInvoiceTaxCode: string;
+
+  @Column({ nullable: true })
+  defaultInvoiceRate: number;
+
+  @Column({ nullable: true })
+  defaultInvoiceSimpleNationalOptIn: boolean;
+
+  @Column({ nullable: true })
+  defaultInvoiceOperationType: number;
+
+  @Column({ nullable: true })
+  defaultInvoiceWithheldISS: boolean;
+
+  @Column({ nullable: true })
+  defaultInvoiceServiceListItem: string;
 
   @ManyToOne(() => User, (user) => user.companies, {
     onDelete: 'CASCADE',

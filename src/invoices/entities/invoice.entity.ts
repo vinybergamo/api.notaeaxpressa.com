@@ -16,13 +16,46 @@ export class Invoice extends BaseSchema {
   amount: number;
 
   @Column({ nullable: true })
-  description: string;
-
-  @Column()
   issueDate: Date;
 
-  @Column({ default: '1402' })
-  serviceCode: string;
+  @Column({ nullable: true })
+  operationType: number;
+
+  @Column({ nullable: true })
+  simpleNationalOptIn: boolean;
+
+  @Column({ nullable: true })
+  description: string;
+
+  @Column({ nullable: true })
+  withheldISS: boolean;
+
+  @Column({ nullable: true })
+  serviceListItem: string;
+
+  @Column({ nullable: true })
+  taxCode: string;
+
+  @Column({ nullable: true })
+  rate: number;
+
+  @Column({ nullable: true })
+  providerMunicipalRegistration: string;
+
+  @Column({ nullable: true })
+  providerCityCode: string;
+
+  @Column({ nullable: true })
+  providerDocument: string;
+
+  @Column({ nullable: true })
+  providerName: string;
+
+  @Column({ nullable: true })
+  providerStateRegistration: string;
+
+  @Column({ nullable: true })
+  providerDocumentType: string;
 
   @Column({ nullable: true })
   rpsNumber?: string;

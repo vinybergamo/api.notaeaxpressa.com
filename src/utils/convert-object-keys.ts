@@ -75,7 +75,10 @@ export function convertObjectKeys<T = any>(
         const hasParser = parser[fullPath] !== undefined;
 
         const shouldInclude =
-          !!mappedPath || hasMappedChildren || hasParser || !deleteNotMapped;
+          !!mappedPath ||
+          (typeof value === 'object' && hasMappedChildren) || // ✅ CORREÇÃO AQUI
+          hasParser ||
+          !deleteNotMapped;
 
         if (!shouldInclude) continue;
 

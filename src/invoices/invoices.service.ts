@@ -16,6 +16,7 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { Invoice } from './entities/invoice.entity';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import { resolveValue } from '@/utils/resolve-value';
 
 @Injectable()
 export class InvoicesService {
@@ -79,6 +80,11 @@ export class InvoicesService {
       correlationId: format(new Date(), 'yyyyMMddHHmmssSSS'),
       issueDate: new Date(createInvoiceDto.issueDate),
       index: count + 1,
+      providerDocumentType: company.documentType.split(':')[1].toLowerCase(),
+      providerCityCode: company.cityCode,
+      providerMunicipalRegistration: company.municipalRegistration,
+      providerDocument: company.document,
+      providerName: company.name,
       company,
       charge,
       customer,
@@ -145,6 +151,9 @@ export class InvoicesService {
   }
 
   private async sendToProcessingQueue(charge: Charge) {
+    const company = await this.companiesRepository.findByIdOrFail(
+      charge.company.id,
+    );
     const invoice = await this.createInvoice(charge.user, {
       companyId: charge.company.uuid,
       amount: charge.amount,
@@ -153,6 +162,27 @@ export class InvoicesService {
       chargeId: charge.uuid,
       issueDate: new Date(),
       serviceCode: charge.invoiceServiceCode,
+      operationType: resolveValue(
+        charge.invoiceOperationType,
+        company.defaultInvoiceOperationType,
+        1,
+      ),
+      providerMunicipalRegistration: company.municipalRegistration,
+      rate: resolveValue(charge.invoiceRate, company.defaultInvoiceRate, 0),
+      providerCityCode: company.cityCode,
+      serviceListItem:
+        charge.invoiceServiceCode || company.defaultInvoiceServiceListItem,
+      simpleNationalOptIn: resolveValue(
+        charge.invoiceSimpleNationalOptIn,
+        company.defaultInvoiceSimpleNationalOptIn,
+        false,
+      ),
+      taxCode: charge.invoiceTaxCode || company.defaultInvoiceTaxCode,
+      withheldISS: resolveValue(
+        charge.invoiceWithheldISS,
+        company.defaultInvoiceWithheldISS,
+        false,
+      ),
     });
 
     await this.invoicesQueue.add('proccess', invoice, {

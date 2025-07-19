@@ -275,6 +275,21 @@ export class Charge extends BaseSchema {
   @Column({ nullable: true })
   invoiceServiceCode: string;
 
+  @Column({ nullable: true })
+  invoiceWithheldISS: boolean;
+
+  @Column({ nullable: true })
+  invoiceOperationType: number;
+
+  @Column({ nullable: true })
+  invoiceRate: number;
+
+  @Column({ nullable: true })
+  invoiceSimpleNationalOptIn: boolean;
+
+  @Column({ nullable: true })
+  invoiceTaxCode: string;
+
   @Exclude()
   @Column({ type: 'jsonb', nullable: true })
   metadata?: Record<string, any>;
